@@ -1,0 +1,142 @@
+{% load static %}
+
+{% extends 'farm_aid/base.html' %}
+{% block content %}
+<h1>Apply for FarmAid Support</h1>
+<p>Please complete all required fields marked *</p>
+
+<form id="regForm" method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+
+  <!-- Personal Information -->
+  <fieldset>
+    <legend>Personal Information</legend>
+
+    <div class="form-row">
+      <label for="full_name">Full Name *</label>
+      <input id="full_name" name="full_name" required>
+    </div>
+
+    <div class="form-row">
+      <label for="id_number">ID / Passport Number *</label>
+      <input id="id_number" name="id_number" required>
+    </div>
+
+    <div class="form-row">
+      <label for="gender">Gender *</label>
+      <select id="gender" name="gender" required>
+        <option value="">-- Select --</option>
+        <option>Male</option>
+        <option>Female</option>
+        <option>Other</option>
+      </select>
+    </div>
+
+    <div class="form-row">
+      <label for="dob">Date of Birth *</label>
+      <input type="date" id="dob" name="dob" required>
+    </div>
+
+    <div class="form-row">
+      <label for="phone">Phone Number *</label>
+      <input type="tel" id="phone" name="phone" placeholder="+254700000000" required>
+    </div>
+
+    <div class="form-row">
+      <label for="email">Email (optional)</label>
+      <input type="email" id="email" name="email">
+    </div>
+  </fieldset>
+
+  <!-- Location Details -->
+  <fieldset>
+    <legend>Location Details</legend>
+
+    <div class="form-row">
+      <label for="county">County *</label>
+      <select id="county" name="county" required>
+        <option value="">-- Select County --</option>
+        <option>Uasin Gishu</option>
+        <option>Nakuru</option>
+        <option>Kakamega</option>
+        <!-- add all counties -->
+      </select>
+    </div>
+
+    <div class="form-row">
+      <label for="sub_county">Sub-county *</label>
+      <input id="sub_county" name="sub_county" required>
+    </div>
+
+    <div class="form-row">
+      <label for="ward">Ward *</label>
+      <input id="ward" name="ward" required>
+    </div>
+
+    <div class="form-row">
+      <label for="village">Village (optional)</label>
+      <input id="village" name="village">
+    </div>
+  </fieldset>
+
+  <!-- Farm Details -->
+  <fieldset>
+    <legend>Farm Information</legend>
+
+    <div class="form-row">
+      <label for="farm_size">Farm Size (acres) *</label>
+      <input type="number" id="farm_size" name="farm_size" min="0.1" step="0.1" required>
+    </div>
+
+    <div class="form-row">
+      <label for="crops">Crops Grown *</label>
+      <textarea id="crops" name="crops" rows="2" placeholder="e.g. maize, beans" required></textarea>
+    </div>
+
+    <div class="form-row">
+      <label for="livestock">Livestock (if any)</label>
+      <textarea id="livestock" name="livestock" rows="2" placeholder="e.g. cattle, goats"></textarea>
+    </div>
+
+    <div class="form-row">
+      <label for="aid_type">Type of Aid Requested *</label>
+      <select id="aid_type" name="aid_type" required>
+        <option value="">-- Select --</option>
+        <option>Seedlings</option>
+        <option>Fertilizers</option>
+        <option>Cattle Vaccination</option>
+        <option>Financial Assistance</option>
+        <option>Other</option>
+      </select>
+    </div>
+  </fieldset>
+
+  <!-- Supporting Documents -->
+  <fieldset>
+    <legend>Documents</legend>
+
+    <div class="form-row">
+      <label for="id_scan">National ID / Passport Scan *</label>
+      <input type="file" id="id_scan" name="id_scan" accept="image/*,application/pdf" required>
+    </div>
+
+    <div class="form-row">
+      <label for="land_docs">Land Ownership / Tenancy Proof *</label>
+      <input type="file" id="land_docs" name="land_docs" accept="image/*,application/pdf" required>
+    </div>
+
+    <div class="form-row">
+      <label for="extra_docs">Other Supporting Documents</label>
+      <input type="file" id="extra_docs" name="extra_docs" multiple>
+    </div>
+  </fieldset>
+
+  <!-- Hidden geolocation -->
+  <input type="hidden" name="latitude">
+  <input type="hidden" name="longitude">
+
+  <button type="submit">Submit Application</button>
+</form>
+
+<div id="message" aria-live="polite"></div>
+{% endblock %}
