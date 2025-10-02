@@ -1,0 +1,11 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <h1>Welcome to Farm Aid</h1>
+    <p>A platform to help farmers register for aid and track their applications.</p>
+    <a href="{% url 'register' %}" class="btn">Get Started</a>
+</div>
+{% endblock %}

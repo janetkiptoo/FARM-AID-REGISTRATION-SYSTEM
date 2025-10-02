@@ -39,13 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'core',
     'users',
-     "corsheaders",
     
 
 ]
-LOGIN_URL = "login"
-LOGIN_REDIRECT_URL = "dashboard"
-LOGOUT_REDIRECT_URL = "login"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -55,9 +51,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-     "corsheaders.middleware.CorsMiddleware",
 ]
-CORS_ALLOW_ALL_ORIGINS = True   
 
 ROOT_URLCONF = 'farm_aid_backend.urls'
 
@@ -124,11 +118,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / "core/static",]
-
-
-
+STATIC_URL = 'static/'
+STATICFILES_DIRS = [BASE_DIR / "farm_aid_backend/farm_aid/static"]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
