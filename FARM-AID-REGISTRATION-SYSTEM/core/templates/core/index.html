@@ -3,9 +3,95 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
+
+<!-- Hero Section -->
 <div class="hero">
-    <h1>Welcome to Farm Aid</h1>
-    <p>A platform to help farmers register for aid and track their applications.</p>
+    <h1>Welcome to FarmAid Kenya</h1>
+    <p>Empowering farmers with equal access to seedlings, fertilizers, and livestock vaccination support.</p>
     <a href="{% url 'register' %}" class="btn">Get Started</a>
 </div>
+
+<!-- About Section -->
+<section class="about">
+    <h2>About FarmAid</h2>
+    <p>
+        FarmAid Kenya is an online platform designed to help farmers register for government aid programs 
+        quickly, fairly, and transparently. Our system ensures that resources reach genuine farmers efficiently 
+        while giving government officials tools to manage aid distribution.
+    </p>
+</section>
+
+<!-- Features Section -->
+<section class="features">
+    <h2>Why Choose FarmAid?</h2>
+    <div class="features-grid">
+        <div class="feature-card">
+            <h3>Easy Registration</h3>
+            <p>Farmers can register online in just a few steps.</p>
+        </div>
+        <div class="feature-card">
+            <h3>Transparency</h3>
+            <p>Eliminates duplicate or fraudulent applications.</p>
+        </div>
+        <div class="feature-card">
+            <h3>Location Awareness</h3>
+            <p>Aid is distributed fairly based on region.</p>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="how-it-works">
+    <h2>How It Works</h2>
+    <div class="steps">
+        <div class="step">1</div>
+        <p>Sign Up</p>
+        <div class="step">2</div>
+        <p>Submit Details</p>
+        <div class="step">3</div>
+        <p>Verification</p>
+        <div class="step">4</div>
+        <p>Approval</p>
+        <div class="step">5</div>
+        <p>Aid Delivery</p>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="stats">
+    <div class="stat">
+        <h3>500+</h3>
+        <p>Farmers Registered</p>
+    </div>
+    <div class="stat">
+        <h3>300+</h3>
+        <p>Aid Packages Delivered</p>
+    </div>
+    <div class="stat">
+        <h3>50+</h3>
+        <p>Counties Covered</p>
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="testimonials">
+    <h2>What Farmers Say</h2>
+    <div class="testimonials-grid">
+        <div class="testimonial">
+            <p>"FarmAid made it so easy to apply for support. I received my seedlings on time!"</p>
+            <span>- Jane, Nakuru</span>
+        </div>
+        <div class="testimonial">
+            <p>"This platform is transparent and fair. No more middlemen."</p>
+            <span>- Peter, Eldoret</span>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="cta">
+    <h2>Ready to Register?</h2>
+    <a href="{% url 'register' %}" class="btn">Register Now</a>
+</section>
+
 {% endblock %}
