@@ -1,4 +1,5 @@
 {% extends 'core/base.html' %}
+{% load static %}
 
 {% block title %}Home{% endblock %}
 
@@ -14,31 +15,47 @@
 <!-- About Section -->
 <section class="about">
     <h2>About FarmAid</h2>
-    <p>
-        FarmAid Kenya is an online platform designed to help farmers register for government aid programs 
-        quickly, fairly, and transparently. Our system ensures that resources reach genuine farmers efficiently 
-        while giving government officials tools to manage aid distribution.
-    </p>
+
+    <div class="about-container">
+        <div class="about-text">
+            <p>
+                FarmAid Kenya is an online platform designed to help farmers register for government aid programs 
+                quickly, fairly, and transparently. Our system ensures that resources reach genuine farmers efficiently 
+                while giving government officials tools to manage aid distribution.
+            </p>
+        </div>
+
+        <div class="about-image">
+            <img src="{% static 'images/farmers.jpeg' %}" alt="Farmers working in the field">
+        </div>
+    </div>
 </section>
 
+
 <!-- Features Section -->
+{% load static %}
+
 <section class="features">
     <h2>Why Choose FarmAid?</h2>
     <div class="features-grid">
         <div class="feature-card">
+            <img src="{% static 'images/sprout.png' %}" alt="Easy Registration Icon" class="feature-icon">
             <h3>Easy Registration</h3>
             <p>Farmers can register online in just a few steps.</p>
         </div>
         <div class="feature-card">
+            <img src="{% static 'images/search.png' %}" alt="Transparency Icon" class="feature-icon">
             <h3>Transparency</h3>
             <p>Eliminates duplicate or fraudulent applications.</p>
         </div>
         <div class="feature-card">
+            <img src="{% static 'images/placeholder.png' %}" alt="Location Icon" class="feature-icon">
             <h3>Location Awareness</h3>
             <p>Aid is distributed fairly based on region.</p>
         </div>
     </div>
 </section>
+
 
 <!-- How It Works Section -->
 <section class="how-it-works">

@@ -1,34 +1,42 @@
 {% extends "base.html" %}
 
-{% block title %}Application Status{% endblock %}
-
 {% block content %}
 <div class="status-container">
-  <h2>Your Application Status</h2>
+    <h2>My Application Status</h2>
 
-  {% if applications %}
-    <table class="status-table">
-      <thead>
-        <tr>
-          <th>Application ID</th>
-          <th>Type</th>
-          <th>Date Submitted</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for app in applications %}
-        <tr>
-          <td>{{ app.id }}</td>
-          <td>{{ app.type }}</td>
-          <td>{{ app.created_at|date:"Y-m-d" }}</td>
-          <td>{{ app.status }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  {% else %}
-    <p>You have not submitted any applications yet.</p>
-  {% endif %}
+    <div class="farmer-details">
+        <p><strong>Name:</strong> {{ farmer.full_name }}</p>
+        <p><strong>ID Number:</strong> {{ farmer.id_number }}</p>
+        <p><strong>Phone:</strong> {{ farmer.phone_number }}</p>
+        <p><strong>County:</strong> {{ farmer.county }}</p>
+    </div>
+
+    <hr>
+
+    {% if farmer.applications.all %}
+        <h3>Applications</h3>
+        <table class="applications-table">
+            <thead>
+                <tr>
+                    <th>Resource Requested</th>
+                    <th>Applied On</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for application in farmer.applications.all %}
+                <tr>
+                    <td>{{ application.resources_needed }}</td>
+                    <td>{{ application.applied_at|date:"Y-m-d H:i" }}</td>
+                    <td class="status {{ application.status|lower }}">
+                        {{ application.get_status_display }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>You haven’t submitted any applications yet.</p>
+    {% endif %}
 </div>
 {% endblock %}

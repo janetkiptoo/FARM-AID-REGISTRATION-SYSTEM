@@ -1,15 +1,44 @@
 {% extends "base.html" %}
 
-{% block title %}Dashboard{% endblock %}
-
 {% block content %}
-<div class="dashboard-container">
-  <h2>Welcome, {{ user.username }}</h2>
+<h2>Farmer Applications Dashboard</h2>
 
-  <div class="dashboard-links">
-    <a href="{% url 'submit_application' %}" class="btn">Submit Application</a>
-    <a href="{% url 'status' %}" class="btn">Check Status</a>
-    <a href="{% url 'logout' %}" class="btn logout">Logout</a>
-  </div>
-</div>
+{% if applications %}
+<table class="applications-table">
+    <thead>
+        <tr>
+            <th>Farmer Name</th>
+            <th>ID Number</th>
+            <th>Phone</th>
+            <th>County</th>
+            <th>Resource Requested</th>
+            <th>Applied On</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for application in applications %}
+        <tr>
+            <td>{{ application.farmer.full_name }}</td>
+            <td>{{ application.farmer.id_number }}</td>
+            <td>{{ application.farmer.phone_number }}</td>
+            <td>{{ application.farmer.county }}</td>
+            <td>{{ application.resources_needed }}</td>
+            <td>{{ application.applied_at|date:"Y-m-d H:i" }}</td>
+            <td class="status {{ application.status|lower }}">
+    {{ application.get_status_display }}
+    | <a href="{% url 'status' application.farmer.id_number %}">Check Status</a>
+</td>
+
+
+
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No applications have been submitted yet.</p>
+{% endif %}
+
 {% endblock %}
