@@ -5,12 +5,11 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib import messages
-import json
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from .models import Farmer, AidApplication
+from .models import AidApplication, Farmer
 from .forms import FarmerForm, AidApplicationForm
-from .models import Farmer, AidApplication
+import json
 
 
 
@@ -20,6 +19,8 @@ applications = []  # temporary store (replace with DB model later)
 
 
 # Farmer registration + Aid application
+
+
 def apply_aid(request):
     if request.method == "POST":
         farmer_form = FarmerForm(request.POST)
@@ -28,19 +29,19 @@ def apply_aid(request):
         if farmer_form.is_valid() and aid_form.is_valid():
             id_number = farmer_form.cleaned_data["id_number"]
 
-            # Check if farmer already exists
+            # Check if farmer exists or create new
             farmer, created = Farmer.objects.get_or_create(
                 id_number=id_number,
                 defaults=farmer_form.cleaned_data
             )
 
-            # If farmer exists but we want to update their details
+            # If farmer exists, update their info
             if not created:
                 for field, value in farmer_form.cleaned_data.items():
                     setattr(farmer, field, value)
                 farmer.save()
 
-            # Prevent duplicate aid requests (same farmer + same resource)
+            # Check duplicate aid application
             resource = aid_form.cleaned_data["resources_needed"]
             if AidApplication.objects.filter(farmer=farmer, resources_needed=resource).exists():
                 messages.error(request, f"You have already applied for {resource}.")
@@ -50,7 +51,11 @@ def apply_aid(request):
                 aid_application.save()
                 messages.success(request, "Application submitted successfully!")
 
-            return redirect("apply_aid")
+
+                print("FarmerForm instance:", farmer_form)   # DEBUG
+        print("AidForm instance:", aid_form)         # DEBUG
+
+        return redirect("apply_aid")
     else:
         farmer_form = FarmerForm()
         aid_form = AidApplicationForm()
@@ -59,6 +64,7 @@ def apply_aid(request):
         "farmer_form": farmer_form,
         "aid_form": aid_form
     })
+
 
 
 # Farmer Dashboard (basic example)
@@ -71,12 +77,14 @@ def dashboard(request):
     })
 
 def status_view(request, id_number):
-    # Look up farmer application by ID number
-    application = get_object_or_404(FarmerApplication, id_number=id_number)
-    
+    farmer = get_object_or_404(Farmer, id_number=id_number)
+    applications = AidApplication.objects.filter(farmer=farmer)
+
     return render(request, "core/status.html", {
-        "application": application
+        "farmer": farmer,
+        "applications": applications
     })
+
 
 def index(request):
     farmer = None
@@ -96,14 +104,6 @@ def logout_view(request):
     return redirect("login")
 
 
-@login_required
-def dashboard(request):
-    return render(request, "core/dashboard.html")
-
-def status(request):
-    return render(request, "core/status.html")
 
 
-@login_required
-def apply_aid(request):
-    return render(request, "core/apply_aid.html")
+

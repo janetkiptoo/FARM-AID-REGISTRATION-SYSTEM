@@ -4,41 +4,26 @@
 <h2>Farmer Applications Dashboard</h2>
 
 {% if applications %}
-<table class="applications-table">
-    <thead>
-        <tr>
-            <th>Farmer Name</th>
-            <th>ID Number</th>
-            <th>Phone</th>
-            <th>County</th>
-            <th>Resource Requested</th>
-            <th>Applied On</th>
-            <th>Status</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for application in applications %}
-        <tr>
-            <td>{{ application.farmer.full_name }}</td>
-            <td>{{ application.farmer.id_number }}</td>
-            <td>{{ application.farmer.phone_number }}</td>
-            <td>{{ application.farmer.county }}</td>
-            <td>{{ application.resources_needed }}</td>
-            <td>{{ application.applied_at|date:"Y-m-d H:i" }}</td>
-            <td class="status {{ application.status|lower }}">
-    {{ application.get_status_display }}
-    | <a href="{% url 'status' application.farmer.id_number %}">Check Status</a>
-</td>
-
-
-
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+    <table border="1" cellpadding="8" cellspacing="0">
+        <thead>
+            <tr>
+                <th>Aid Type</th>
+                <th>Date Applied</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for app in applications %}
+            <tr>
+                <td>{{ app.aid_type }}</td>
+                <td>{{ app.created_at }}</td>
+                <td>{{ app.status }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 {% else %}
-<p>No applications have been submitted yet.</p>
+    <p>No applications have been submitted yet.</p>
+    <a href="{% url 'apply_aid' %}" class="btn">Apply Now</a>
 {% endif %}
-
 {% endblock %}
