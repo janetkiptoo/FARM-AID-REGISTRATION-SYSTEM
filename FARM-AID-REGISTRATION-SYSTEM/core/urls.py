@@ -6,9 +6,9 @@ urlpatterns = [
     path("", views.index, name="index"),
   
     path("logout/", views.logout_view, name="logout"),
-path("apply/", views.apply_aid, name="apply_aid"),
+    path("apply/", views.apply_aid, name="apply_aid"),
     path("dashboard/", views.dashboard, name="dashboard"),
-  path("status/<id_number>/", views.status_view, name="status"),
-
+    path("status/<id_number>/", views.status_view, name="status"),
+    path('withdraw/<int:app_id>/', views.withdraw_application, name='withdraw_application'),
 
 ]

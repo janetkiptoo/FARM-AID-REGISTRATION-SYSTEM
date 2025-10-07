@@ -9,6 +9,7 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from .models import AidApplication, Farmer
 from .forms import FarmerForm, AidApplicationForm
+
 import json
 
 
@@ -19,8 +20,6 @@ applications = []  # temporary store (replace with DB model later)
 
 
 # Farmer registration + Aid application
-
-
 def apply_aid(request):
     if request.method == "POST":
         farmer_form = FarmerForm(request.POST)
@@ -35,13 +34,16 @@ def apply_aid(request):
                 defaults=farmer_form.cleaned_data
             )
 
-            # If farmer exists, update their info
-            if not created:
-                for field, value in farmer_form.cleaned_data.items():
-                    setattr(farmer, field, value)
-                farmer.save()
+            # ✅ Link farmer to logged-in user if not already linked
+            if request.user.is_authenticated:
+                farmer.user = request.user
 
-            # Check duplicate aid application
+            # ✅ Update farmer info if already exists
+            for field, value in farmer_form.cleaned_data.items():
+                setattr(farmer, field, value)
+            farmer.save()
+
+            # ✅ Prevent duplicate applications
             resource = aid_form.cleaned_data["resources_needed"]
             if AidApplication.objects.filter(farmer=farmer, resources_needed=resource).exists():
                 messages.error(request, f"You have already applied for {resource}.")
@@ -51,11 +53,8 @@ def apply_aid(request):
                 aid_application.save()
                 messages.success(request, "Application submitted successfully!")
 
+            return redirect("apply_aid")
 
-                print("FarmerForm instance:", farmer_form)   # DEBUG
-        print("AidForm instance:", aid_form)         # DEBUG
-
-        return redirect("apply_aid")
     else:
         farmer_form = FarmerForm()
         aid_form = AidApplicationForm()
@@ -67,14 +66,32 @@ def apply_aid(request):
 
 
 
-# Farmer Dashboard (basic example)
 def dashboard(request):
-    farmers = Farmer.objects.all()
-    applications = AidApplication.objects.all()
+    try:
+        farmer = Farmer.objects.get(user=request.user)
+        applications = AidApplication.objects.filter(farmer=farmer)
+    except Farmer.DoesNotExist:
+        farmer = None
+        applications = None
+
     return render(request, "core/dashboard.html", {
-        "farmers": farmers,
-        "applications": applications
+        "farmer": farmer,
+        "applications": applications,
     })
+
+@login_required
+def withdraw_application(request, app_id):
+    farmer = get_object_or_404(Farmer, user=request.user)
+    application = get_object_or_404(AidApplication, id=app_id, farmer=farmer)
+
+    if application.status == 'pending':
+        application.delete()
+        messages.success(request, "Your application has been successfully withdrawn.")
+    else:
+        messages.error(request, "You can only withdraw pending applications.")
+
+    return redirect('dashboard')
+
 
 def status_view(request, id_number):
     farmer = get_object_or_404(Farmer, id_number=id_number)
@@ -96,6 +113,8 @@ def index(request):
         except Farmer.DoesNotExist:
             farmer = None
     return render(request, "core/index.html", {"farmer": farmer})
+
+# Removed duplicate withdraw_application function
 
 
 

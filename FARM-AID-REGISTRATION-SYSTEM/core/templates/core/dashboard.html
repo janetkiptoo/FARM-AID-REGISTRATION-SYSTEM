@@ -1,29 +1,44 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>Farmer Applications Dashboard</h2>
+<div class="dashboard-container">
+    <h2>Farmer Dashboard</h2>
 
-{% if applications %}
-    <table border="1" cellpadding="8" cellspacing="0">
-        <thead>
-            <tr>
-                <th>Aid Type</th>
-                <th>Date Applied</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for app in applications %}
-            <tr>
-                <td>{{ app.aid_type }}</td>
-                <td>{{ app.created_at }}</td>
-                <td>{{ app.status }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-{% else %}
-    <p>No applications have been submitted yet.</p>
-    <a href="{% url 'apply_aid' %}" class="btn">Apply Now</a>
-{% endif %}
+    {% if farmer %}
+        <div class="farmer-info">
+            <p><strong>Name:</strong> {{ farmer.full_name }}</p>
+            <p><strong>ID Number:</strong> {{ farmer.id_number }}</p>
+            <p><strong>Phone:</strong> {{ farmer.phone_number }}</p>
+            <p><strong>County:</strong> {{ farmer.county }}</p>
+        </div>
+
+        <hr>
+
+        {% if applications %}
+            <h3>Your Aid Applications</h3>
+            <table class="applications-table">
+                <thead>
+                    <tr>
+                        <th>Resource</th>
+                        <th>Status</th>
+                        <th>Applied On</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for app in applications %}
+                        <tr>
+                            <td>{{ app.get_resources_needed_display }}</td>
+                            <td class="status {{ app.status|lower }}">{{ app.get_status_display }}</td>
+                            <td>{{ app.applied_at|date:"Y-m-d H:i" }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>You haven’t made any aid applications yet.</p>
+        {% endif %}
+    {% else %}
+        <p>No farmer profile found for your account. Please register as a farmer first.</p>
+    {% endif %}
+</div>
 {% endblock %}
