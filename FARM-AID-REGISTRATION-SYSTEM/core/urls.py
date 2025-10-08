@@ -9,6 +9,8 @@ urlpatterns = [
     path("apply/", views.apply_aid, name="apply_aid"),
     path("dashboard/", views.dashboard, name="dashboard"),
     path("status/<id_number>/", views.status_view, name="status"),
-    path('withdraw/<int:app_id>/', views.withdraw_application, name='withdraw_application'),
+    path('delete/<int:app_id>/', views.delete_application, name='delete_application'),
+    path('reapply/<int:app_id>/', views.reapply_application, name='reapply_application'),
+
 
 ]

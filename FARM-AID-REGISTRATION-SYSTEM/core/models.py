@@ -44,8 +44,7 @@ class AidApplication(models.Model):
     ], default='pending')
     applied_at = models.DateTimeField(auto_now_add=True)
 
-    class Meta:
-        unique_together = ('farmer', 'resources_needed')  # prevent duplicate same-aid requests
+   
 
     def __str__(self):
         return f"{self.farmer.full_name} - {self.resources_needed}"

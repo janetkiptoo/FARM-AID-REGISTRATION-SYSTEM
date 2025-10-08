@@ -31,8 +31,19 @@
                     <td class="status {{ application.status|lower }}">
                         {{ application.get_status_display }}
                     </td>
-                </tr>
-                {% endfor %}
+    <td>
+        {% if application.status == 'pending' %}
+            <form method="POST" action="{% url 'delete_application' application.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn delete-btn">Delete</button>
+            </form>
+        {% endif %}
+        {% if application.status == 'rejected' %}
+            <a href="{% url 'reapply_application' application.id %}" class="btn btn-warning btn-sm">Reapply</a>
+        {% endif %}
+    </td>
+</tr>
+{% endfor %}
             </tbody>
         </table>
     {% else %}

@@ -59,3 +59,44 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
+
+// === Password Toggle ===
+function togglePassword(id) {
+  const field = document.getElementById(id);
+  const icon = field.nextElementSibling;
+
+  if (field.type === "password") {
+    field.type = "text";
+    icon.textContent = "🙈"; // hide icon
+  } else {
+    field.type = "password";
+    icon.textContent = "👁️"; // show icon
+  }
+}
+
+// === Password Strength Checker ===
+function checkStrength() {
+  const password = document.getElementById("password1").value;
+  const strength = document.getElementById("password-strength");
+
+  let score = 0;
+  if (password.length >= 8) score++;
+  if (/[A-Z]/.test(password)) score++;
+  if (/[a-z]/.test(password)) score++;
+  if (/[0-9]/.test(password)) score++;
+  if (/[^A-Za-z0-9]/.test(password)) score++;
+
+  if (password.length === 0) {
+    strength.textContent = "";
+  } else if (score <= 2) {
+    strength.textContent = "Weak password ❌";
+    strength.style.color = "red";
+  } else if (score === 3) {
+    strength.textContent = "Medium password ⚠️";
+    strength.style.color = "orange";
+  } else {
+    strength.textContent = "Strong password ✅";
+    strength.style.color = "green";
+  }
+}
+
