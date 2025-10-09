@@ -1,44 +1,38 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
 <div class="dashboard-container">
-    <h2>Farmer Dashboard</h2>
+<h2>Welcome, {{ farmer.full_name }} 👋</h2>
 
-    {% if farmer %}
-        <div class="farmer-info">
-            <p><strong>Name:</strong> {{ farmer.full_name }}</p>
-            <p><strong>ID Number:</strong> {{ farmer.id_number }}</p>
-            <p><strong>Phone:</strong> {{ farmer.phone_number }}</p>
-            <p><strong>County:</strong> {{ farmer.county }}</p>
-        </div>
 
-        <hr>
+ <div class="dashboard-summary">
+  <div class="summary-card total">
+    <h3>Total Applications</h3>
+    <p>{{ total }}</p>
+  </div>
+  <div class="summary-card approved">
+    <h3>Approved</h3>
+    <p>{{ approved }}</p>
+  </div>
+  <div class="summary-card pending">
+    <h3>Pending</h3>
+    <p>{{ pending }}</p>
+  </div>
+  <div class="summary-card rejected">
+    <h3>Rejected</h3>
+    <p>{{ rejected }}</p>
+  </div>
+</div>
 
-        {% if applications %}
-            <h3>Your Aid Applications</h3>
-            <table class="applications-table">
-                <thead>
-                    <tr>
-                        <th>Resource</th>
-                        <th>Status</th>
-                        <th>Applied On</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for app in applications %}
-                        <tr>
-                            <td>{{ app.get_resources_needed_display }}</td>
-                            <td class="status {{ app.status|lower }}">{{ app.get_status_display }}</td>
-                            <td>{{ app.applied_at|date:"Y-m-d H:i" }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <p>You haven’t made any aid applications yet.</p>
-        {% endif %}
-    {% else %}
-        <p>No farmer profile found for your account. Please register as a farmer first.</p>
-    {% endif %}
+  
+  <div class="dashboard-profile">
+    <h3>Your Profile</h3>
+    <p><strong>ID Number:</strong> {{ farmer.id_number }}</p>
+    <p><strong>County:</strong> {{ farmer.county }}</p>
+  <p><strong>Location:</strong> {{ farmer.ward }}, {{ farmer.sub_county }}</p>
+
+    <p><strong>Farming Type:</strong> {{ farmer.farming_type }}</p>
+  </div>
 </div>
 {% endblock %}
