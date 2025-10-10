@@ -1,0 +1,49 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Contact Us{% endblock %}
+
+{% block content %}
+
+{% if messages %}
+  <div class="messages">
+    {% for message in messages %}
+      <p class="{{ message.tags }}">{{ message }}</p>
+    {% endfor %}
+  </div>
+{% endif %}
+
+<section class="contact-page">
+    <div class="contact-header">
+        <h1>Contact Us</h1>
+        <p>If you need help with registration or have inquiries, we’d love to hear from you.</p>
+    </div>
+
+    <div class="contact-grid">
+        <!-- Contact Details -->
+        <div class="contact-info">
+            <div class="contact-item">
+                <i class="fas fa-phone-alt"></i>
+                <p><strong>Call Us:</strong> +254 712 345 678</p>
+            </div>
+            <div class="contact-item">
+                <i class="fas fa-envelope"></i>
+                <p><strong>Email:</strong> support@farmaidkenya.go.ke</p>
+            </div>
+            <div class="contact-item">
+                <i class="fas fa-map-marker-alt"></i>
+                <p><strong>Address:</strong> Nairobi, Kenya</p>
+            </div>
+        </div>
+
+        <!-- Contact Form -->
+        <form class="contact-form" method="POST">
+            {% csrf_token %}
+            <input type="text" name="name" placeholder="Your Name" required>
+            <input type="email" name="email" placeholder="Your Email" required>
+            <textarea name="message" rows="4" placeholder="Your Message..." required></textarea>
+            <button type="submit">Send Message</button>
+        </form>
+    </div>
+</section>
+{% endblock %}

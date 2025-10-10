@@ -103,6 +103,7 @@ section h2 {
     font-size: 2rem;
     margin-bottom: 20px;
     position: relative;
+    text-align: center;
 }
 
 section h2::after {
@@ -158,13 +159,18 @@ section h2::after {
 
 /* How It Works */
 .steps {
-    
-    grid-template-columns: repeat(5, 1fr);
-    gap: 15px;
-    margin-top: 40px;
-    align-items: center;
-    justify-items: center;
     display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 20px;
+    margin-top: 40px;
+    text-align: center;
+}
+
+.step-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 .step {
@@ -179,28 +185,54 @@ section h2::after {
     color: #228b22;
     font-weight: bold;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    margin-bottom: 10px;
 }
+
 
 
 /* Stats Section */
 .stats {
-    display: flex;
-    justify-content: space-around;
-    flex-wrap: wrap;
-    margin-top: 40px;
+    background: #f8f8f8;
+    padding: 60px 20px;
+    text-align: center;
 }
 
+
+.stats h2 {
+    font-size: 2rem;
+    margin-bottom: 40px;
+    color: #050505;
+    position: relative;
+}
+
+
+
+/* Grid layout for stats */
+.stats-grid {
+    display: flex;
+    justify-content: space-around;
+    gap: 80px;
+    flex-wrap: wrap;
+}
+
+/* Individual stat cards */
 .stat {
-    flex: 1;
-    min-width: 200px;
-    margin: 20px;
+    text-align: center;
+    flex: auto;
 }
 
 .stat h3 {
-    font-size: 2rem;
     color: #228b22;
+    font-size: 2rem;
+    font-weight: bold;
     margin-bottom: 10px;
 }
+
+.stat p {
+    font-size: 20px;
+    color: #111111;
+}
+
 
 /* Testimonials */
 .testimonials-grid {
@@ -238,12 +270,14 @@ section h2::after {
 .cta .btn {
     background: #fcd34d;
     color: #000;
+    padding: 10px 15px;
+    border-radius: 2px;
+    width: auto;
 }
 
 .cta .btn:hover {
     background: #facc15;
 }
-
 
 
 /* Navbar */
@@ -426,45 +460,54 @@ input[type="text"], input[type="email"], input[type="password"] {
     from { opacity: 0; transform: translateY(-20px); }
     to { opacity: 1; transform: translateY(0); }
 }
-/* dashboard.css */
-
-h2.dashboard-title {
-    text-align: center;
-    margin-bottom: 20px;
-    font-family: Arial, sans-serif;
-    color: #2c3e50;
-}
-.dashboard-cards {
-    display: flex;
-    justify-content: space-around;
-    flex-wrap: wrap;
-    margin-bottom: 30px;
-    gap: 15px;
+.dashboard-container {
+  max-width: 900px;
+  margin: 30px auto;
+  padding: 20px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.1);
 }
 
-
-
-table.dashboard-table {
-    width: 90%;
-    border-collapse: collapse;
-    font-family: Arial, sans-serif;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+.dashboard-container h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #2c3e50;
 }
 
-table.dashboard-table thead tr {
-    background-color: #91b692;
-    color: white;
-    text-align: left;
+.dashboard-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 15px;
+  margin-bottom: 25px;
 }
 
-table.dashboard-table th,
-table.dashboard-table td {
-    padding: 20px;
+.summary-card {
+  text-align: center;
+  padding: 15px;
+  border-radius: 8px;
+  color: #fff;
 }
 
-table.dashboard-table tbody tr {
-    border-bottom: 1px solid #ddd;
+.summary-card.total { background: #34495e; }
+.summary-card.approved { background: #27ae60; }
+.summary-card.pending { background: #f1c40f; }
+.summary-card.rejected { background: #e74c3c; }
+
+
+
+
+.dashboard-profile {
+  background: #ecf0f1;
+  padding: 20px;
+  border-radius: 10px;
 }
+
+.dashboard-profile h3 {
+  margin-bottom: 15px;
+  color: #2c3e50;
+}
+
 
 
 .no-applications {
@@ -671,4 +714,228 @@ table.dashboard-table tbody tr {
 .msg.error {
     background: #e74c3c;
     color: white;
+}
+
+
+
+
+.contact-page {
+    background: #f7fdf7;
+    padding: 70px 20px;
+    min-height: 100px;
+}
+
+.contact-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.contact-header h1 {
+    color: #122446;
+    font-size: 2.5rem;
+}
+
+.contact-header p {
+    color: #555;
+    font-size: 1rem;
+}
+
+/* Grid Layout */
+.contact-grid {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 40px;
+}
+
+/* Info Cards */
+.contact-info {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.contact-item {
+    background: #fff;
+    padding: 20px 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 0.95rem;
+}
+
+.contact-item i {
+    color: #228b22;
+    font-size: 1.4rem;
+}
+
+/* Form */
+.contact-form {
+    background: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    width: 500px;
+    height: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.contact-form input,
+.contact-form textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+    resize: none;
+}
+
+.contact-form button {
+    background: #125517;
+    color: #fff;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.3s ease;
+}
+
+.contact-form button:hover {
+    background: #1c6e1c;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .contact-grid {
+        flex-direction: column;
+        align-items: center;
+    }
+    .contact-form, .contact-info {
+        width: 100%;
+        max-width: 400px;
+    }
+}
+
+.messages {
+    margin: 20px auto;
+    text-align: center;
+}
+
+.messages p {
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.messages .success {
+    background: #e6ffed;
+    color: #207a2a;
+    border: 1px solid #b4e5c1;
+}
+
+
+
+
+/* 🌿 General Page Styling */
+body {
+  background-color: #f8faf8;
+  font-family: "Poppins", sans-serif;
+  color: #333;
+}
+
+/* Container and Form Card */
+.container {
+  max-width: 600px;
+  margin: 50px auto;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 16px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+}
+
+h2 {
+  font-weight: 600;
+  color: #198754; /* Bootstrap success green */
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* Form Elements */
+form label {
+  font-weight: 500;
+  color: #444;
+  margin-bottom: 6px;
+  display: block;
+}
+
+form input,
+form select {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  background-color: #f9f9f9;
+  transition: all 0.2s ease-in-out;
+}
+
+form input:focus,
+form select:focus {
+  border-color: #198754;
+  background-color: #fff;
+  outline: none;
+  box-shadow: 0 0 5px rgba(25, 135, 84, 0.2);
+}
+
+/* Buttons */
+.btn-success {
+  background-color: #198754;
+  border: none;
+  border-radius: 30px;
+  padding: 10px 25px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn-success:hover {
+  background-color: #157347;
+  transform: scale(1.05);
+}
+
+.btn-secondary {
+  border-radius: 30px;
+  padding: 10px 25px;
+}
+
+/* Centered Button Group */
+.text-center {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+/* Small tweaks for mobile */
+@media (max-width: 768px) {
+  .container {
+    margin-top: 20px;
+    padding: 0 10px;
+  }
+  .btn-success, .btn-secondary {
+    width: 100%;
+  }
 }

@@ -72,6 +72,7 @@ function togglePassword(id) {
     field.type = "password";
     icon.textContent = "👁️"; // show icon
   }
+
 }
 
 // === Password Strength Checker ===
@@ -99,4 +100,6 @@ function checkStrength() {
     strength.style.color = "green";
   }
 }
+
+
 

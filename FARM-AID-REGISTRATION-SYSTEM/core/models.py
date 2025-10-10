@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django import forms
 
 class Farmer(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
@@ -12,45 +13,76 @@ class Farmer(models.Model):
     sub_county = models.CharField(max_length=100)
     ward = models.CharField(max_length=100)
     farm_size = models.DecimalField(max_digits=10, decimal_places=2)
-    farming_type = models.CharField(max_length=50, choices=[
-        ('crop', 'Crop Farming'),
-        ('livestock', 'Livestock Farming'),
-        ('mixed', 'Mixed Farming'),
-    ])
+    farming_type = models.CharField(
+        max_length=50,
+        choices=[
+            ('crop', 'Crop Farming'),
+            ('livestock', 'Livestock Farming'),
+            ('mixed', 'Mixed Farming'),
+        ]
+    )
 
     latitude = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
     longitude = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
-
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.full_name} ({self.id_number})"
 
 
+class ContactMessage(models.Model):
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Message from {self.name} ({self.email})"
+
+
 class AidApplication(models.Model):
     farmer = models.ForeignKey(Farmer, on_delete=models.CASCADE, related_name="applications")
-    resources_needed = models.CharField(max_length=200, choices=[
-        ('seedlings', 'Seedlings'),
-        ('fertilizers', 'Fertilizers'),
-        ('pesticides', 'Pesticides'),
-        ('livestock_vaccines', 'Livestock Vaccines'),
-        ('equipment', 'Farming Equipment'),
-        ('financial_support', 'Financial Support'),
-    ])
-    status = models.CharField(max_length=50, choices=[
-        ('pending', 'Pending'),
-        ('approved', 'Approved'),
-        ('rejected', 'Rejected'),
-    ], default='pending')
+    resources_needed = models.CharField(
+        max_length=200,
+        choices=[
+            ('seedlings', 'Seedlings'),
+            ('fertilizers', 'Fertilizers'),
+            ('pesticides', 'Pesticides'),
+            ('livestock_vaccines', 'Livestock Vaccines'),
+            ('equipment', 'Farming Equipment'),
+            ('financial_support', 'Financial Support'),
+        ]
+    )
+    status = models.CharField(
+        max_length=50,
+        choices=[
+            ('pending', 'Pending'),
+            ('approved', 'Approved'),
+            ('rejected', 'Rejected'),
+        ],
+        default='pending'
+    )
     applied_at = models.DateTimeField(auto_now_add=True)
-
-   
 
     def __str__(self):
         return f"{self.farmer.full_name} - {self.resources_needed}"
-    
-
-    
 
 
 
+class FarmerUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Farmer
+        fields = [
+            "full_name",
+            "phone_number",
+            "email",
+            "county",
+            "sub_county",
+            "ward",
+            "farm_size",
+            "farming_type",
+        ]
+        widgets = {
+            "farming_type": forms.Select(attrs={"class": "form-control"}),
+            "farm_size": forms.NumberInput(attrs={"step": "0.01", "class": "form-control"}),
+        }

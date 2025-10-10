@@ -9,6 +9,11 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from .models import AidApplication, Farmer
 from .forms import FarmerForm, AidApplicationForm
+from django.contrib import messages
+from .models import ContactMessage
+from .forms import FarmerUpdateForm
+
+
 
 import json
 
@@ -88,19 +93,31 @@ def apply_aid(request):
 
 
 
-
+@login_required
 def dashboard(request):
-    try:
-        farmer = Farmer.objects.get(user=request.user)
-        applications = AidApplication.objects.filter(farmer=farmer)
-    except Farmer.DoesNotExist:
-        farmer = None
-        applications = None
+    farmer = Farmer.objects.filter(user=request.user).first()
+    if not farmer:
+        messages.error(request, "No farmer profile found for your account. Please register as a farmer first.")
+        return redirect("register_farmer")
 
-    return render(request, "core/dashboard.html", {
+    applications = AidApplication.objects.filter(farmer=farmer)
+
+    # Compute summary stats safely
+    total = applications.count()
+    approved = applications.filter(status="approved").count()
+    pending = applications.filter(status="pending").count()
+    rejected = applications.filter(status="rejected").count()
+
+    context = {
         "farmer": farmer,
         "applications": applications,
-    })
+        "total": total,
+        "approved": approved,
+        "pending": pending,
+        "rejected": rejected,
+    }
+    return render(request, "core/dashboard.html", context)
+
 
 @login_required
 def delete_application(request, app_id):
@@ -153,7 +170,51 @@ def index(request):
 
 # Removed duplicate withdraw_application function
 
+def contact(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        message_text = request.POST.get('message')
 
+        # Basic validation (optional but recommended)
+        if not name or not email or not message_text:
+            messages.error(request, "Please fill in all fields.")
+            return redirect('contact')
+
+        # Save message to the database
+        ContactMessage.objects.create(
+            name=name,
+            email=email,
+            message=message_text
+        )
+
+        messages.success(request, "Your message has been received! We'll get back to you soon.")
+        return redirect('contact')
+
+    return render(request, 'core/contact.html')
+
+
+
+
+@login_required
+def profile_update(request):
+    farmer = Farmer.objects.filter(user=request.user).first()
+    if not farmer:
+        messages.error(request, "No farmer profile found. Please register as a farmer first.")
+        return redirect("register_farmer")
+
+    if request.method == "POST":
+        form = FarmerUpdateForm(request.POST, instance=farmer)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Your profile has been updated successfully ✅")
+            return redirect("dashboard")
+        else:
+            messages.error(request, "Please correct the errors below.")
+    else:
+        form = FarmerUpdateForm(instance=farmer)
+
+    return render(request, "core/profile_update.html", {"form": form, "farmer": farmer})
 
 def logout_view(request):
     logout(request)

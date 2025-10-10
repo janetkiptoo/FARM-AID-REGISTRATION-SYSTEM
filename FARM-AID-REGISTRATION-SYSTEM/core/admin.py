@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import Farmer, AidApplication
+from .models import Farmer, AidApplication,ContactMessage
 
 
 @admin.register(Farmer)
@@ -27,3 +27,10 @@ class AidApplicationAdmin(admin.ModelAdmin):
 
     colored_status.admin_order_field = "status"
     colored_status.short_description = "Status"
+
+
+@admin.register(ContactMessage)
+class ContactMessageAdmin(admin.ModelAdmin):
+    list_display = ('name', 'email', 'created_at')
+    search_fields = ('name', 'email')
+    ordering = ('-created_at',)
