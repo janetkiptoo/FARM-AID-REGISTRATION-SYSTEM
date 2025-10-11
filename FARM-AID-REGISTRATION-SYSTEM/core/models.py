@@ -19,7 +19,8 @@ class Farmer(models.Model):
             ('crop', 'Crop Farming'),
             ('livestock', 'Livestock Farming'),
             ('mixed', 'Mixed Farming'),
-        ]
+        ], blank=True,
+    null=True
     )
 
     latitude = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
