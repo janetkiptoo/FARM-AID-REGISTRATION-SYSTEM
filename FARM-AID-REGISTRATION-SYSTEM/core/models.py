@@ -19,6 +19,7 @@ class Farmer(models.Model):
             ('crop', 'Crop Farming'),
             ('livestock', 'Livestock Farming'),
             ('mixed', 'Mixed Farming'),
+            
         ], blank=True,
     null=True
     )

@@ -12,6 +12,8 @@ from .forms import FarmerForm, AidApplicationForm
 from django.contrib import messages
 from .models import ContactMessage
 from .forms import FarmerUpdateForm
+from django.contrib.admin.views.decorators import staff_member_required
+from django.http import HttpResponse
 
 
 
@@ -25,39 +27,29 @@ applications = []  # temporary store (replace with DB model later)
 
 
 # Farmer registration + Aid application
+@login_required
 def apply_aid(request):
+    """
+    Combined Farmer registration/update + Aid application view.
+    """
+    # Try to get the farmer profile for the logged-in user
+    farmer = Farmer.objects.filter(user=request.user).first()
+
     if request.method == "POST":
+        farmer_form = FarmerForm(request.POST, instance=farmer)
         aid_form = AidApplicationForm(request.POST)
-        id_number = request.POST.get("id_number")
 
-        # Try to get or create the farmer manually to avoid form uniqueness validation
-        farmer = None
-        if id_number:
-            try:
-                farmer = Farmer.objects.get(id_number=id_number)
-                # Update farmer info with new data
-                farmer.full_name = request.POST.get("full_name", farmer.full_name)
-                farmer.phone_number = request.POST.get("phone_number", farmer.phone_number)
-                farmer.county = request.POST.get("county", farmer.county)
-                farmer.sub_county = request.POST.get("sub_county", farmer.sub_county)
-                farmer.ward = request.POST.get("ward", farmer.ward)
-                if request.user.is_authenticated:
-                    farmer.user = request.user
-                farmer.save()
-            except Farmer.DoesNotExist:
-                farmer = Farmer.objects.create(
-                    id_number=id_number,
-                    full_name=request.POST.get("full_name"),
-                    phone_number=request.POST.get("phone_number"),
-                    county=request.POST.get("county"),
-                    sub_county=request.POST.get("sub_county"),
-                    ward=request.POST.get("ward"),
-                    farm_size=request.POST.get("farm_size") or 0,
-                    farming_type=request.POST.get("farming_type") or "mixed",
-                    user=request.user if request.user.is_authenticated else None
-                )
+        # Save or update farmer profile
+        if farmer_form.is_valid():
+            farmer = farmer_form.save(commit=False)
+            farmer.user = request.user
+            farmer.save()
+            messages.success(request, "Farmer profile saved successfully ✅")
+        else:
+            messages.error(request, "Please correct the farmer info errors.")
 
-        if aid_form.is_valid() and farmer:
+        # Save aid application if farmer exists
+        if farmer and aid_form.is_valid():
             resource = aid_form.cleaned_data["resources_needed"]
 
             # Prevent duplicate active applications
@@ -75,18 +67,22 @@ def apply_aid(request):
                 aid_application = aid_form.save(commit=False)
                 aid_application.farmer = farmer
                 aid_application.save()
-                messages.success(request, "Application submitted successfully!")
+                messages.success(request, "Aid application submitted successfully ✅")
 
-            return redirect("apply_aid")
+            return redirect("dashboard")  # after submission, go to dashboard
 
     else:
-        farmer_form = FarmerForm()
+        farmer_form = FarmerForm(instance=farmer)
         aid_form = AidApplicationForm()
 
-    return render(request, "core/apply_aid.html", {
-        "farmer_form": FarmerForm(),
-        "aid_form": AidApplicationForm(),
-    })
+    return render(
+        request,
+        "core/apply_aid.html",
+        {"farmer_form": farmer_form, "aid_form": aid_form, "farmer": farmer}
+    )
+
+
+
 
 
 
@@ -97,8 +93,11 @@ def apply_aid(request):
 def dashboard(request):
     farmer = Farmer.objects.filter(user=request.user).first()
     if not farmer:
-        messages.error(request, "No farmer profile found for your account. Please register as a farmer first.")
-        return redirect("register_farmer")
+        messages.error(
+            request, 
+            "No farmer profile found for your account. Please register as a farmer first."
+        )
+        return redirect("apply_aid")  # updated redirect
 
     applications = AidApplication.objects.filter(farmer=farmer)
 
@@ -201,7 +200,7 @@ def profile_update(request):
     farmer = Farmer.objects.filter(user=request.user).first()
     if not farmer:
         messages.error(request, "No farmer profile found. Please register as a farmer first.")
-        return redirect("register_farmer")
+        return redirect("apply_aid")  # updated redirect
 
     if request.method == "POST":
         form = FarmerUpdateForm(request.POST, instance=farmer)
@@ -223,4 +222,23 @@ def logout_view(request):
 
 
 
+def farmers_map(request):
+    farmers = Farmer.objects.values("full_name", "county", "latitude", "longitude")
+    return render(request, "core/farmers_map.html", {"farmers": list(farmers)})
+
+
+def farmers_map_data(request):
+    farmers = Farmer.objects.all()
+    data = [
+        {
+            "name": farmer.full_name,
+            "county": farmer.county,
+            "latitude": farmer.latitude,
+            "longitude": farmer.longitude,
+            "farm_size": farmer.farm_size,
+        }
+        for farmer in farmers
+        if farmer.latitude and farmer.longitude
+    ]
+    return JsonResponse(data, safe=False)
 

@@ -18,7 +18,7 @@ body {
 h1, h2, h3 {
     font-weight: bold;
     margin-bottom: 15px;
-    color: #222;
+     color: #000;
 }
 
 p {
@@ -472,7 +472,7 @@ input[type="text"], input[type="email"], input[type="password"] {
 .dashboard-container h2 {
   text-align: center;
   margin-bottom: 25px;
-  color: #2c3e50;
+  color: #0d0d0e
 }
 
 .dashboard-summary {
@@ -621,7 +621,7 @@ input[type="text"], input[type="email"], input[type="password"] {
     background-color: rgb(24, 99, 168);
 }
 
-/* Centering the form container */
+
 /* Container */
 .apply-aid-container {
     max-width: 800px;
@@ -635,7 +635,7 @@ input[type="text"], input[type="email"], input[type="password"] {
 /* Heading */
 .apply-aid-container h2 {
     text-align: center;
-    color: #2c3e50;
+    color: #0d0d0e;
     margin-bottom: 25px;
     font-size: 1.8rem;
 }
@@ -731,8 +731,8 @@ input[type="text"], input[type="email"], input[type="password"] {
 }
 
 .contact-header h1 {
-    color: #122446;
-    font-size: 2.5rem;
+    color: #0d0d0e;
+    font-size: 30px;
 }
 
 .contact-header p {
@@ -872,7 +872,7 @@ body {
 
 h2 {
   font-weight: 600;
-  color: #198754; /* Bootstrap success green */
+ color: #0d0d0e;
   text-align: center;
   margin-bottom: 20px;
 }
@@ -938,4 +938,19 @@ form select:focus {
   .btn-success, .btn-secondary {
     width: 100%;
   }
+}
+
+
+#map {
+  height: 500px;
+  border-radius: 12px;
+  margin: 20px auto;
+  width: 90%;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+h2 {
+  text-align: center;
+  font-weight: bold;
+  color: #2c3e50;
 }

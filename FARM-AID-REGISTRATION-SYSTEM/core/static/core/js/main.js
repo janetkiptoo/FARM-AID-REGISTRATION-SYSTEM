@@ -102,4 +102,32 @@ function checkStrength() {
 }
 
 
+document.addEventListener("DOMContentLoaded", function () {
+  // Initialize map centered in Kenya
+  const map = L.map("map").setView([0.0236, 37.9062], 6);
+
+  const farmers = JSON.parse(document.getElementById("farmers-data").textContent);
+
+
+  // Add OpenStreetMap tiles
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 18,
+    attribution: "&copy; OpenStreetMap contributors",
+  }).addTo(map);
+
+  // Add farmer markers
+  if (Array.isArray(farmers) && farmers.length > 0) {
+    farmers.forEach((farmer) => {
+      if (farmer.latitude && farmer.longitude) {
+        L.marker([farmer.latitude, farmer.longitude])
+          .addTo(map)
+          .bindPopup(
+            `<b>${farmer.full_name}</b><br>County: ${farmer.county}`
+          );
+      }
+    });
+  } else {
+    console.log("No farmer data available.");
+  }
+});
 

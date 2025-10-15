@@ -4,8 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <title>FarmAid Kenya</title>
-    <link rel="stylesheet" href="{% static 'core/css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'core/css/style.css' %}">
     <script src="{% static 'core/js/main.js' %}" defer></script>
+    
+
 </head> 
 <body>
     <nav>
@@ -18,6 +20,9 @@
         <a href="{% url 'apply_aid' %}">Apply for Aid</a>
         <a href="{% url 'contact' %}">Contact</a>
         <a href="{% url 'profile_update' %}">Edit Profile</a>
+        
+       
+
 
 
             <a href="{% url 'logout' %}">Logout</a>

@@ -1,6 +1,6 @@
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
-from core.models import Farmer, AidApplication  # ✅ make sure AidApplication is imported
+from core.models import Farmer, AidApplication
 
 
 @csrf_exempt
@@ -22,7 +22,7 @@ def ussd_callback(request):
             response += "3. Track Application\n"
             response += "4. Exit"
 
-        # --- REGISTER AS FARMER ---
+        # --- REGISTER FARMER ---
         elif user_response[0] == "1":
             if level == 1:
                 response = "CON Enter your Full Name:"
@@ -37,7 +37,12 @@ def ussd_callback(request):
             elif level == 6:
                 response = "CON Enter your Farm Size (in acres):"
             elif level == 7:
-                response = "CON Select your Farming Type:\n1. Crop Farming\n2. Livestock Farming\n3. Mixed Farming"
+                response = (
+                    "CON Select your Farming Type:\n"
+                    "1. Crop Farming\n"
+                    "2. Livestock Farming\n"
+                    "3. Mixed Farming"
+                )
             elif level == 8:
                 try:
                     full_name = user_response[1]
@@ -53,6 +58,7 @@ def ussd_callback(request):
                         "2": "livestock",
                         "3": "mixed",
                     }
+
                     farming_type = farming_type_map.get(farming_choice, "crop")
 
                     Farmer.objects.get_or_create(
@@ -69,11 +75,12 @@ def ussd_callback(request):
                     )
 
                     response = "END Registration successful! Welcome to FarmAid Kenya."
+
                 except Exception as e:
                     print("Error saving farmer:", e)
                     response = "END Something went wrong. Please try again."
             else:
-                response = "END Invalid input. Please try again."
+                response = "END Invalid input. Please start again."
 
         # --- APPLY FOR AID ---
         elif user_response[0] == "2":
@@ -84,34 +91,81 @@ def ussd_callback(request):
                 return HttpResponse(response)
 
             if level == 1:
-                response = "CON Select Aid Type:\n1. Fertilizer\n2. Seeds\n3. Livestock Support"
-            elif level == 2:
-                response = "CON Enter a short reason for your request:"
-            elif level == 3:
-                aid_type_map = {"1": "Fertilizer", "2": "Seeds", "3": "Livestock Support"}
-                aid_type = aid_type_map.get(user_response[1], "Other")
-                reason = user_response[2]
-
-                AidApplication.objects.create(
-                    farmer=farmer,
-                    aid_type=aid_type,
-                    reason=reason,
-                    status="Pending",
+                response = (
+                    "CON Select Aid Type:\n"
+                    "1. Seedlings\n"
+                    "2. Fertilizers\n"
+                    "3. Pesticides\n"
+                    "4. Livestock Vaccines\n"
+                    "5. Equipment\n"
+                    "6. Financial Support"
                 )
-                response = f"END Your {aid_type} aid application has been received."
+
+            elif level == 2:
+                aid_type_map = {
+                    "1": "seedlings",
+                    "2": "fertilizers",
+                    "3": "pesticides",
+                    "4": "livestock_vaccines",
+                    "5": "equipment",
+                    "6": "financial_support",
+                }
+
+                aid_type = aid_type_map.get(user_response[1])
+                if not aid_type:
+                    response = "END Invalid selection. Please try again."
+                else:
+                    # --- Prevent duplicate pending aid applications ---
+                    existing = AidApplication.objects.filter(
+                        farmer=farmer,
+                        resources_needed=aid_type,
+                        status="pending"
+                    ).exists()
+
+                    if existing:
+                        response = (
+                            f"END You already have a pending {aid_type.replace('_', ' ')} aid application.\n"
+                            f"Please wait for it to be processed before applying again."
+                        )
+                    else:
+                        AidApplication.objects.create(
+                            farmer=farmer,
+                            resources_needed=aid_type,
+                            status="pending",
+                        )
+
+                        response = (
+                            f"END Your {aid_type.replace('_', ' ')} aid application "
+                            f"has been received successfully.\n"
+                            f"Location: {farmer.county}, {farmer.sub_county}, {farmer.ward}."
+                        )
             else:
-                response = "END Invalid input. Please try again."
+                response = "END Invalid option. Please try again."
 
-        # --- TRACK APPLICATION (coming soon) ---
         elif user_response[0] == "3":
-            response = "END Feature coming soon."
+            try:
+                farmer = Farmer.objects.get(phone_number=phone_number)
+                applications = AidApplication.objects.filter(farmer=farmer).order_by('-applied_at')
 
-        # --- EXIT ---
+                if applications.exists():
+                    response = "END Your aid application statuses:\n"
+                    for app in applications[:5]:
+        
+                        response += f"- {app.resources_needed.replace('_', ' ').title()}: {app.status.title()} ({app.applied_at.date()})\n"
+
+                    response += "\nThank you for using FarmAid Kenya."
+                else:
+                    response = "END You have no aid applications yet."
+            except Farmer.DoesNotExist:
+                response = "END You need to register first to track applications."
+
         elif user_response[0] == "4":
             response = "END Thank you for using FarmAid Kenya."
 
-        # --- INVALID OPTION ---
         else:
             response = "END Invalid option. Please try again."
 
-        return HttpResponse(response)
+    # ✅ Always return a response, no matter what
+    return HttpResponse(response)
+
+

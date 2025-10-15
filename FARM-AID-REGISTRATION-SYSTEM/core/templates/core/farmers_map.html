@@ -1,0 +1,55 @@
+{% extends 'core/base.html' %}
+{% load static %}   <!-- ✅ Add this line -->
+
+{% block content %}
+<h2 class="text-center mt-4 mb-3">Farmers Map</h2>
+
+<!-- Map container -->
+<div id="map" class="map-container"></div>
+
+<!-- JSON data for JavaScript -->
+{{ farmers|json_script:"farmers-data" }}
+
+
+<!-- Include Leaflet CSS & JS -->
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
+<script
+  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+</script>
+
+<!-- Include your map JS -->
+<script src="{% static 'core/js/farmers_map.js' %}"></script>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- Your custom JS -->
+<script>
+  const farmers = JSON.parse(document.getElementById("farmers-data").textContent);
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const map = L.map("map").setView([0.0236, 37.9062], 6);
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 18,
+      attribution: "&copy; OpenStreetMap contributors",
+    }).addTo(map);
+
+    if (Array.isArray(farmers) && farmers.length > 0) {
+      farmers.forEach((farmer) => {
+        if (farmer.latitude && farmer.longitude) {
+          L.marker([farmer.latitude, farmer.longitude])
+            .addTo(map)
+            .bindPopup(`<b>${farmer.full_name}</b><br>County: ${farmer.county}`);
+        }
+      });
+    } else {
+      console.log("No farmer data available.");
+    }
+  });
+</script>
+
+{% endblock %}
