@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 from .models import Farmer, AidApplication,ContactMessage
+from .models import Notification
 
 
 @admin.register(Farmer)
@@ -34,3 +35,6 @@ class ContactMessageAdmin(admin.ModelAdmin):
     list_display = ('name', 'email', 'created_at')
     search_fields = ('name', 'email')
     ordering = ('-created_at',)
+
+  
+admin.site.register(Notification)

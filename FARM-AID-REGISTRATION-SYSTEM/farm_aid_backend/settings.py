@@ -11,6 +11,12 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv
+load_dotenv()
+AFRICASTALKING_USERNAME = os.getenv("Sandbox")
+AFRICASTALKING_API_KEY = os.getenv("atsk_5b254d369598cb7309f0e80d7faed886f687a79ae551d0cf2d6a0d517fd28a46a4ad4c47")
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent

@@ -14,6 +14,8 @@ from .models import ContactMessage
 from .forms import FarmerUpdateForm
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import HttpResponse
+from .sms_utils import send_sms_notification
+from .models import Notification
 
 
 
@@ -80,6 +82,19 @@ def apply_aid(request):
         "core/apply_aid.html",
         {"farmer_form": farmer_form, "aid_form": aid_form, "farmer": farmer}
     )
+
+def notify_farmer(aid_application, message):
+    farmer = aid_application.farmer
+    phone = farmer.phone_number  # Make sure Farmer model has this field
+
+    # Save to DB
+    notif = Notification.objects.create(farmer=farmer, message=message)
+
+    # Send SMS
+    sent = send_sms_notification(phone, message)
+    if sent:
+        notif.status = 'sent'
+        notif.save()
 
 
 

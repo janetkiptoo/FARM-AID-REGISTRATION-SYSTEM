@@ -2,6 +2,20 @@ from django.db import models
 from django.contrib.auth.models import User
 from django import forms
 
+
+
+# County coordinates (approximate centers)
+COUNTY_COORDS = {
+    "Uasin Gishu": (0.5143, 35.2698),
+    "Nakuru": (-0.3031, 36.0800),
+    "Kericho": (-0.3670, 35.2831),
+    "Bungoma": (0.5631, 34.5600),
+    "Kisumu": (-0.0917, 34.7680),
+    "Elgeyo Marakwet": (0.8520, 35.5135),
+    "Nandi": (0.1742, 35.0675),
+    "Kisii": (-0.6817, 34.7667),
+}
+
 class Farmer(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
     full_name = models.CharField(max_length=200)
@@ -88,3 +102,12 @@ class FarmerUpdateForm(forms.ModelForm):
             "farming_type": forms.Select(attrs={"class": "form-control"}),
             "farm_size": forms.NumberInput(attrs={"step": "0.01", "class": "form-control"}),
         }
+
+class Notification(models.Model):
+    farmer = models.ForeignKey(Farmer, on_delete=models.CASCADE)
+    message = models.TextField()
+    status = models.CharField(max_length=10, choices=[('pending', 'Pending'), ('sent', 'Sent')], default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"To {self.farmer.full_name}: {self.message[:30]}"

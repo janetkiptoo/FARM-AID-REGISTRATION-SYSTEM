@@ -101,13 +101,9 @@ function checkStrength() {
   }
 }
 
-
 document.addEventListener("DOMContentLoaded", function () {
-  // Initialize map centered in Kenya
+  // Initialize map centered roughly in Kenya
   const map = L.map("map").setView([0.0236, 37.9062], 6);
-
-  const farmers = JSON.parse(document.getElementById("farmers-data").textContent);
-
 
   // Add OpenStreetMap tiles
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -115,19 +111,35 @@ document.addEventListener("DOMContentLoaded", function () {
     attribution: "&copy; OpenStreetMap contributors",
   }).addTo(map);
 
+  // Parse farmer data safely
+  const farmersScript = document.getElementById("farmers-data");
+  let farmers = [];
+  if (farmersScript) {
+    try {
+      farmers = JSON.parse(farmersScript.textContent);
+    } catch (error) {
+      console.error("Error parsing farmers data:", error);
+    }
+  }
+
   // Add farmer markers
+  const markers = [];
   if (Array.isArray(farmers) && farmers.length > 0) {
     farmers.forEach((farmer) => {
       if (farmer.latitude && farmer.longitude) {
-        L.marker([farmer.latitude, farmer.longitude])
+        const marker = L.marker([farmer.latitude, farmer.longitude])
           .addTo(map)
           .bindPopup(
-            `<b>${farmer.full_name}</b><br>County: ${farmer.county}`
+            `<b>${farmer.full_name}</b><br>County: ${farmer.county}<br>Farm Size: ${farmer.farm_size} acres`
           );
+        markers.push(marker);
       }
     });
+
+    // ✅ Auto-fit map to show all farmer markers
+    const group = new L.featureGroup(markers);
+    map.fitBounds(group.getBounds(), { padding: [40, 40] });
   } else {
-    console.log("No farmer data available.");
+    console.log("No farmer data available or no coordinates found.");
   }
 });
-
