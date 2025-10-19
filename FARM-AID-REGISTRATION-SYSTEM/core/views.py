@@ -3,7 +3,9 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+User = get_user_model()
+
 from django.contrib import messages
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
@@ -16,8 +18,16 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.http import HttpResponse
 from .sms_utils import send_sms_notification
 from .models import Notification
+from .forms import NotificationForm
+from django.contrib.auth.decorators import login_required, user_passes_test
 
 
+import africastalking
+
+username = "sandbox"
+api_key = "atsk_5b254d369598cb7309f0e80d7faed886f687a79ae551d0cf2d6a0d517fd28a46a4ad4c47"
+africastalking.initialize(username, api_key)
+sms = africastalking.SMS
 
 import json
 
@@ -257,3 +267,44 @@ def farmers_map_data(request):
     ]
     return JsonResponse(data, safe=False)
 
+
+
+
+
+
+
+def send_sms_notification(recipients, message):
+    try:
+        response = sms.send(message, recipients)
+        print("✅ SMS sent:", response)
+        return response
+    except Exception as e:
+        print("❌ SMS error:", e)
+        return None
+def send_notification(request):
+    if request.method == "POST":
+        form = NotificationForm(request.POST)
+        if form.is_valid():
+            recipient_type = form.cleaned_data['recipient_type']
+            phone_number = form.cleaned_data['phone_number']
+            message = form.cleaned_data['message']
+
+            if recipient_type == 'single' and phone_number:
+                send_sms_notification(phone_number, message)
+                messages.success(request, f"✅ SMS sent successfully to {phone_number}")
+            elif recipient_type == 'all':
+                farmers = Farmer.objects.all()
+                for farmer in farmers:
+                    send_sms_notification(farmer.phone_number, message)
+                messages.success(request, f"✅ SMS sent to all farmers ({farmers.count()} total)")
+            else:
+                messages.error(request, "⚠️ Please select a valid recipient or enter a phone number.")
+
+            return redirect('send_notification')
+    else:
+        form = NotificationForm()
+
+    return render(request, 'core/send_notification.html', {'form': form})
+
+
+   

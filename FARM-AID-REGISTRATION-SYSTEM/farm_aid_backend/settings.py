@@ -48,9 +48,12 @@ INSTALLED_APPS = [
     'core',
     'users',
      "corsheaders",
-    
+   
+
 
 ]
+AUTH_USER_MODEL = 'core.User'
+
 LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "dashboard"
 LOGOUT_REDIRECT_URL = "login"

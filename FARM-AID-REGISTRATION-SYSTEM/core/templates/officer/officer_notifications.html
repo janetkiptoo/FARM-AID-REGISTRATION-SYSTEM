@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Notifications</h2>
+<table border="1">
+  <tr>
+    <th>Message</th><th>Recipients</th><th>Date</th>
+  </tr>
+  {% for n in notifications %}
+  <tr>
+    <td>{{ n.message }}</td>
+    <td>{% if n.sent_to_all %}All Farmers{% else %}Selected{% endif %}</td>
+    <td>{{ n.created_at }}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}

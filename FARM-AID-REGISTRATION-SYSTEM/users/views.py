@@ -1,10 +1,13 @@
 from django.http import HttpResponse
 
 from django.shortcuts import render, redirect
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+User = get_user_model()
+
 from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate, login, logout
+from .forms import OfficerRegistrationForm
 
 
 
@@ -52,3 +55,17 @@ def logout_view(request):
     logout(request)
     messages.info(request, "You have been logged out.")
     return redirect("login")
+
+
+def register_officer(request):
+    if request.method == 'POST':
+        form = OfficerRegistrationForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.is_officer = True
+            user.save()
+            login(request, user)
+            return redirect('officer_dashboard')
+    else:
+        form = OfficerRegistrationForm()
+    return render(request, 'users/register_officer.html', {'form': form})

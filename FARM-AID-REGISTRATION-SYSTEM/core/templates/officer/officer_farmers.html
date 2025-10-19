@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Registered Farmers</h2>
+<table border="1">
+  <tr>
+    <th>Name</th><th>ID Number</th><th>Phone</th><th>County</th><th>Ward</th>
+  </tr>
+  {% for farmer in farmers %}
+  <tr>
+    <td>{{ farmer.full_name }}</td>
+    <td>{{ farmer.id_number }}</td>
+    <td>{{ farmer.phone_number }}</td>
+    <td>{{ farmer.county }}</td>
+    <td>{{ farmer.ward }}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}

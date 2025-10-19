@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<h2>Aid Applications</h2>
+
+{% if messages %}
+  <ul>
+    {% for message in messages %}
+      <li style="color: {% if message.tags == 'success' %}green{% else %}red{% endif %};">
+        {{ message }}
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+<table border="1" cellpadding="8">
+  <tr>
+    <th>Farmer</th>
+    <th>Resource Needed</th>
+    <th>Status</th>
+    <th>Applied At</th>
+    <th>Actions</th>
+  </tr>
+  {% for app in applications %}
+  <tr>
+    <td>{{ app.farmer.full_name }}</td>
+    <td>{{ app.resources_needed }}</td>
+    <td>{{ app.status|title }}</td>
+    <td>{{ app.applied_at|date:"Y-m-d H:i" }}</td>
+    <td>
+      {% if app.status == 'pending' %}
+        <a href="{% url 'update_application_status' app.id 'approved' %}" class="btn btn-success">Approve</a>
+        <a href="{% url 'update_application_status' app.id 'rejected' %}" class="btn btn-danger">Reject</a>
+      {% elif app.status == 'approved' %}
+        ✅ Approved
+      {% else %}
+        ❌ Rejected
+      {% endif %}
+    </td>
+  </tr>
+  {% empty %}
+  <tr>
+    <td colspan="5">No applications found.</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}

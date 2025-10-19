@@ -6,4 +6,6 @@ urlpatterns = [
     path("login/", views.login_view, name="login"),  # will implement
     
     path("logout/", views.logout_view, name="logout"), 
+    path('register/officer/', views.register_officer, name='register_officer'),
+
 ]

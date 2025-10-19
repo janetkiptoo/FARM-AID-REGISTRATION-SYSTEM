@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/officer_dashboard.css' %}">
+
+<div class="dashboard-container">
+  <!-- 🔹 Top Navigation -->
+  <nav class="navbar">
+    <div class="nav-left">
+      <h2>FarmAid Officer Panel</h2>
+    </div>
+    <div class="nav-right">
+      <a href="{% url 'officer_dashboard' %}" class="nav-link active">Dashboard</a>
+      <a href="{% url 'officer_farmers' %}" class="nav-link">Farmers</a>
+      <a href="{% url 'officer_applications' %}" class="nav-link">Applications</a>
+      <a href="{% url 'officer_notifications' %}" class="nav-link">Notifications</a>
+      <a href="{% url 'logout' %}" class="logout-btn">Logout</a>
+    </div>
+  </nav>
+
+  <!-- 🔹 Page Title -->
+  <h2 class="dashboard-title">Welcome, Officer {{ user.username }}</h2>
+
+  <!-- 🔹 Statistics Section -->
+  <div class="stats-container">
+    <div class="stat-card">
+      <h3>Total Farmers</h3>
+      <p>{{ total_farmers }}</p>
+    </div>
+    <div class="stat-card">
+      <h3>Total Applications</h3>
+      <p>{{ total_applications }}</p>
+    </div>
+    <div class="stat-card pending">
+      <h3>Pending</h3>
+      <p>{{ pending }}</p>
+    </div>
+    <div class="stat-card approved">
+      <h3>Approved</h3>
+      <p>{{ approved }}</p>
+    </div>
+    <div class="stat-card rejected">
+      <h3>Rejected</h3>
+      <p>{{ rejected }}</p>
+    </div>
+  </div>
+
+  <!-- 🔹 Quick Actions -->
+  <div class="actions">
+    <a href="{% url 'officer_farmers' %}" class="btn">Manage Farmers</a>
+    <a href="{% url 'officer_applications' %}" class="btn">View Applications</a>
+    <a href="{% url 'officer_notifications' %}" class="btn">Send Notifications</a>
+  </div>
+</div>
+{% endblock %}
