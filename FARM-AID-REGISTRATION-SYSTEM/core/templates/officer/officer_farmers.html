@@ -1,18 +1,70 @@
 {% extends "base.html" %}
+{% load static %}
 {% block content %}
-<h2>Registered Farmers</h2>
-<table border="1">
-  <tr>
-    <th>Name</th><th>ID Number</th><th>Phone</th><th>County</th><th>Ward</th>
-  </tr>
-  {% for farmer in farmers %}
-  <tr>
-    <td>{{ farmer.full_name }}</td>
-    <td>{{ farmer.id_number }}</td>
-    <td>{{ farmer.phone_number }}</td>
-    <td>{{ farmer.county }}</td>
-    <td>{{ farmer.ward }}</td>
-  </tr>
-  {% endfor %}
-</table>
+<link rel="stylesheet" href="{% static 'core/css/styles.css' %}">
+
+<div class="farmers-container">
+  <!-- 🔹 Page Header -->
+  <h2 class="page-title">Registered Farmers</h2>
+
+  <!-- 🔹 Search and Filters -->
+  <form method="GET" class="filter-form">
+    <div class="filter-group">
+      <input type="text" name="q" placeholder="Search farmer by name or ID..." value="{{ request.GET.q }}">
+
+      <select name="county">
+        <option value="">All Counties</option>
+        {% for c in counties %}
+          <option value="{{ c }}" {% if request.GET.county == c %}selected{% endif %}>{{ c }}</option>
+        {% endfor %}
+      </select>
+
+      <select name="ward">
+        <option value="">All Wards</option>
+        {% for w in wards %}
+          <option value="{{ w }}" {% if request.GET.ward == w %}selected{% endif %}>{{ w }}</option>
+        {% endfor %}
+      </select>
+
+      <button type="submit">Filter</button>
+      <a href="{% url 'officer_farmers' %}" class="reset-btn">Reset</a>
+    </div>
+  </form>
+
+  <!-- 🔹 Farmers Table -->
+  <div class="table-container">
+    <table class="farmers-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Full Name</th>
+          <th>ID Number</th>
+          <th>Phone</th>
+          <th>Email</th>
+          <th>County</th>
+          <th>Ward</th>
+          <th>Registration Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for farmer in farmers %}
+        <tr>
+          <td>{{ forloop.counter }}</td>
+          <td>{{ farmer.full_name }}</td>
+          <td>{{ farmer.id_number }}</td>
+          <td>{{ farmer.phone_number }}</td>
+          <td>{{ farmer.email }}</td>
+          <td>{{ farmer.county }}</td>
+          <td>{{ farmer.ward }}</td>
+          <td>{{ farmer.date_registered|date:"M d, Y" }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="8" class="no-data">No farmers found.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
 {% endblock %}

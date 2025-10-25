@@ -69,3 +69,4 @@ def register_officer(request):
     else:
         form = OfficerRegistrationForm()
     return render(request, 'users/register_officer.html', {'form': form})
+

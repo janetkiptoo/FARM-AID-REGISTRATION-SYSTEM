@@ -1,16 +1,79 @@
 {% extends "base.html" %}
+{% load static %}
 {% block content %}
-<h2>Notifications</h2>
-<table border="1">
-  <tr>
-    <th>Message</th><th>Recipients</th><th>Date</th>
-  </tr>
-  {% for n in notifications %}
-  <tr>
-    <td>{{ n.message }}</td>
-    <td>{% if n.sent_to_all %}All Farmers{% else %}Selected{% endif %}</td>
-    <td>{{ n.created_at }}</td>
-  </tr>
-  {% endfor %}
-</table>
+
+<link rel="stylesheet" href="{% static 'core/css/styles.css' %}">
+
+<div class="notifications-container">
+
+  <h2>📢 Send SMS Notification</h2>
+
+  <div class="form-card">
+    <form method="POST" class="notification-form">
+      {% csrf_token %}
+      
+      <div class="form-group">
+        {{ form.recipient_type.label_tag }}
+        {{ form.recipient_type }}
+      </div>
+
+      <div id="phone-field" class="form-group">
+        {{ form.phone_number.label_tag }}
+        {{ form.phone_number }}
+      </div>
+
+      <div class="form-group">
+        {{ form.message.label_tag }}
+        {{ form.message }}
+      </div>
+
+      <button type="submit" class="btn-send">Send Notification</button>
+    </form>
+  </div>
+
+  <h3>🕓 Recent Notifications</h3>
+
+  <div class="table-container">
+    <table class="notifications-table">
+      <thead>
+        <tr>
+          <th>Date Sent</th>
+          <th>Recipient Type</th>
+          <th>Phone Number</th>
+          <th>Message</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for n in notifications %}
+        <tr>
+          <td>{{ n.date_sent|date:"Y-m-d H:i" }}</td>
+          <td>{{ n.recipient_type|title }}</td>
+          <td>{{ n.phone_number|default:"All" }}</td>
+          <td>{{ n.message }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4" class="empty-row">No notifications sent yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  // Toggle phone field visibility when "All Farmers" is selected
+  const recipientField = document.querySelector("#id_recipient_type");
+  const phoneField = document.querySelector("#phone-field");
+
+  function togglePhoneField() {
+    if (recipientField.value === "all") {
+      phoneField.style.display = "none";
+    } else {
+      phoneField.style.display = "block";
+    }
+  }
+
+  recipientField.addEventListener("change", togglePhoneField);
+  togglePhoneField(); // Run on page load
+</script>
+
 {% endblock %}

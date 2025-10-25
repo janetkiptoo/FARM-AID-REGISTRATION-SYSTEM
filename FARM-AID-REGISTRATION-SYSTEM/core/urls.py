@@ -15,11 +15,12 @@ urlpatterns = [
     path("profile/update/", views.profile_update, name="profile_update"),
    path("farmers_map/", views.farmers_map, name="farmers_map"),
 path("farmers_map/data/", views.farmers_map_data, name="farmers_map_data"),
-path('send-notification/', views.send_notification, name='send_notification'),
+
     path('officer/dashboard/', officer_views.officer_dashboard, name='officer_dashboard'),
     path('officer/farmers/', officer_views.officer_farmers, name='officer_farmers'),
     path('officer/applications/', officer_views.officer_applications, name='officer_applications'),
-    path('officer/notifications/', officer_views.officer_notifications, name='officer_notifications'),
+    path('officer/notifications/', views.officer_notifications, name='officer_notifications'),
+
     path('officer/application/<int:application_id>/<str:status>/', officer_views.update_application_status, name='update_application_status'),
 
 ]

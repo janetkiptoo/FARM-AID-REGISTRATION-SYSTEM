@@ -272,7 +272,6 @@ def farmers_map_data(request):
 
 
 
-
 def send_sms_notification(recipients, message):
     try:
         response = sms.send(message, recipients)
@@ -281,7 +280,8 @@ def send_sms_notification(recipients, message):
     except Exception as e:
         print("❌ SMS error:", e)
         return None
-def send_notification(request):
+
+def officer_notifications(request):
     if request.method == "POST":
         form = NotificationForm(request.POST)
         if form.is_valid():
@@ -300,11 +300,8 @@ def send_notification(request):
             else:
                 messages.error(request, "⚠️ Please select a valid recipient or enter a phone number.")
 
-            return redirect('send_notification')
+            return redirect('officer_notifications')
     else:
         form = NotificationForm()
 
-    return render(request, 'core/send_notification.html', {'form': form})
-
-
-   
+    return render(request, 'officer/officer_notifications.html', {'form': form})
