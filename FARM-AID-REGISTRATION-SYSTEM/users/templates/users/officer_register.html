@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+
+<div class="register-container">
+  <h2>👮 Register as Officer</h2>
+
+  <form method="POST" class="register-form">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+
+    {% for field in form %}
+      <div class="form-group">
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {% if field.name == 'password1' or field.name == 'password2' %}
+          <div class="password-field">
+            {{ field }}
+            <span class="toggle-password" onclick="togglePassword('{{ field.id_for_label }}', this)">👁️</span>
+          </div>
+        {% else %}
+          {{ field }}
+        {% endif %}
+        {{ field.errors }}
+      </div>
+    {% endfor %}
+
+    <button type="submit" class="btn-register">Register</button>
+  </form>
+
+  <p class="login-link">
+    Already have an account? <a href="{% url 'officer_login' %}">Login here</a>
+  </p>
+</div>
+
+<script>
+  function togglePassword(fieldId, icon) {
+    const input = document.getElementById(fieldId);
+    if (input.type === "password") {
+      input.type = "text";
+      icon.textContent = "🙈";
+    } else {
+      input.type = "password";
+      icon.textContent = "👁️";
+    }
+  }
+</script>
+
+{% endblock %}

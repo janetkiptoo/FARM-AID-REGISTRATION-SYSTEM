@@ -61,12 +61,28 @@ def register_officer(request):
     if request.method == 'POST':
         form = OfficerRegistrationForm(request.POST)
         if form.is_valid():
-            user = form.save(commit=False)
-            user.is_officer = True
-            user.save()
-            login(request, user)
-            return redirect('officer_dashboard')
+            form.save()
+            messages.success(request, "Registration successful! Please log in.")
+            return redirect('officer_login')
     else:
         form = OfficerRegistrationForm()
-    return render(request, 'users/register_officer.html', {'form': form})
+    return render(request, 'users/officer_register.html', {'form': form})
 
+def officer_login(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None and hasattr(user, 'is_officer') and user.is_officer:
+            login(request, user)
+            return redirect('officer_dashboard')  # officer dashboard URL name
+        else:
+            messages.error(request, "Invalid credentials or not authorized as officer.")
+    return render(request, 'users/officer_login.html')
+
+
+def officer_logout(request):
+    logout(request)
+    return redirect('officer_login')
