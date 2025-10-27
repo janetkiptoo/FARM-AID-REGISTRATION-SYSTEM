@@ -1,0 +1,41 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FarmAid Officer Portal</title>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="{% static 'core/css/style.css' %}">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  
+</head>
+
+<body>
+
+  <!-- Officer Navbar -->
+  <nav class="officer-navbar">
+    <div class="logo">🌾 FarmAid Officer</div>
+    <div class="nav-links">
+      <a href="{% url 'officer_dashboard' %}" class="{% if request.resolver_match.url_name == 'officer_dashboard' %}active{% endif %}">Dashboard</a>
+      <a href="{% url 'officer_farmers' %}" class="{% if request.resolver_match.url_name == 'officer_farmers' %}active{% endif %}">Farmers</a>
+      <a href="{% url 'officer_applications' %}" class="{% if request.resolver_match.url_name == 'officer_applications' %}active{% endif %}">Applications</a>
+      <a href="{% url 'officer_notifications' %}" class="{% if request.resolver_match.url_name == 'officer_notifications' %}active{% endif %}">Notifications</a>
+      <a href="{% url 'officer_logout' %}" class="logout-btn">Logout</a>
+    </div>
+  </nav>
+
+  <!-- Officer Page Content -->
+  <main class="officer-main">
+    {% block content %}
+    {% endblock %}
+  </main>
+
+  <footer>
+    &copy; {{ now|date:"Y" }} FarmAid Kenya — Officer Portal
+  </footer>
+
+</body>
+</html>

@@ -956,93 +956,231 @@ h2 {
 }
 
 /* ===== Officer Dashboard Styles ===== */
+/* Genera/* =========================
+   🌿 FarmAid Officer Portal Styles
+   ========================= */
 
-/* General Page Layout */
+/* General Layout */
 body {
-    background-color: #f8fafc;
-    font-family: 'Poppins', sans-serif;
+  background-color: #f5f9ff;
+  font-family: "Poppins", sans-serif;
+  margin: 0;
+  padding: 0;
 }
 
-/* Officer Panel Header */
-.officer-panel-header {
-    background-color: #2563eb;
-    color: white;
-    border-radius: 10px 10px 0 0;
-    padding: 15px 25px;
-    font-weight: 600;
-    font-size: 1.2rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+/* =========================
+   🧭 Officer Navigation Bar
+   ========================= */
+.officer-navbar {
+  background-color: #2e7d32; /* Deep green */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.8rem 2rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.officer-navbar .logo {
+  color: #fff;
+  font-size: 1.4rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.officer-navbar .nav-links {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.officer-navbar .nav-links a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s, background 0.3s;
+  padding: 0.5rem 0.9rem;
+  border-radius: 6px;
+}
+
+.officer-navbar .nav-links a:hover,
+.officer-navbar .nav-links a.active {
+  background-color: #1b5e20; /* Darker green */
+}
+
+.officer-navbar .logout-btn {
+  background-color: #e53935;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background 0.3s ease;
+}
+
+.officer-navbar .logout-btn:hover {
+  background-color: #b71c1c;
+}
+
+/* Responsive Navbar */
+@media (max-width: 768px) {
+  .officer-navbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .officer-navbar .nav-links {
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    margin-top: 0.5rem;
+  }
+}
+
+/* =========================
+   📊 Dashboard Layout
+   ========================= */
+.officer-dashboard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding: 2rem;
+  box-sizing: border-box;
 }
 
 /* Dashboard Container */
-.dashboard-container {
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    max-width: 1000px;
-    margin: 40px auto;
-    overflow: hidden;
+.dashboard-content {
+  background-color: #ffffff;
+  border-radius: 15px;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+  margin-top: 2rem;
+  padding: 2rem;
+  width: 90%;
+  max-width: 1100px;
+  transition: all 0.3s ease;
 }
 
-/* Summary Cards */
-.summary-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 15px;
-    padding: 20px;
+.dashboard-content:hover {
+  transform: translateY(-3px);
 }
 
-.card {
-    text-align: center;
-    background-color: #f1f5f9;
-    border-radius: 10px;
-    padding: 20px;
-    transition: all 0.3s ease;
-}
-.card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+.dashboard-content h2 {
+  text-align: center;
+  color: #2e7d32;
+  font-size: 1.6rem;
+  font-weight: 600;
+  margin-bottom: 2rem;
 }
 
-.card h3 {
-    font-size: 1rem;
-    color: #334155;
-    margin-bottom: 10px;
+/* =========================
+   📈 Stats Cards
+   ========================= */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1.5rem;
+  justify-content: center;
+  margin-bottom: 2rem;
 }
 
-.card span {
-    font-size: 2rem;
-    font-weight: bold;
+.stat-card {
+  text-align: center;
+  padding: 1.5rem;
+  border-radius: 12px;
+  font-weight: 600;
+  color: #333;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* Different Status Colors */
-.pending { background-color: #fef9c3; }
-.approved { background-color: #dcfce7; }
-.rejected { background-color: #fee2e2; }
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
 
-/* Action Buttons */
+/* Stat Card Colors */
+.stat-card.total {
+  background-color: #e3f2fd;
+}
+
+.stat-card.pending {
+  background-color: #fff9c4;
+}
+
+.stat-card.approved {
+  background-color: #c8e6c9;
+}
+
+.stat-card.rejected {
+  background-color: #ffcdd2;
+}
+
+/* =========================
+   🧩 Action Buttons
+   ========================= */
 .action-buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    padding: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
 }
 
-.action-buttons a {
-    text-decoration: none;
+.btn {
+  background-color: #42a5f5;
+  color: #fff;
+  padding: 0.8rem 1.6rem;
+  border-radius: 10px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.btn:hover {
+  background-color: #1e88e5;
+  transform: scale(1.05);
+}
+
+/* =========================
+   ⚙️ Officer Main Layout
+   ========================= */
+.officer-main {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 2rem auto;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* =========================
+   📱 Mobile Adjustments
+   ========================= */
+@media (max-width: 600px) {
+  .dashboard-content {
+    width: 95%;
+    padding: 1.5rem;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .btn {
+    width: 100%;
     text-align: center;
-    background-color: #2563eb;
-    color: white;
-    font-weight: 500;
-    padding: 10px;
-    border-radius: 8px;
-    transition: background-color 0.3s ease;
+  }
 }
-.action-buttons a:hover {
-    background-color: #1d4ed8;
+
+/* =========================
+   🌍 Footer
+   ========================= */
+footer {
+  text-align: center;
+  padding: 1rem;
+  margin-top: 2rem;
+  font-size: 0.9rem;
+  color: #555;
 }
+
 
 /* Logout Button */
 .logout-btn {
@@ -1377,17 +1515,7 @@ body {
   outline: none;
 }
 
-.password-group {
-  position: relative;
-}
 
-.toggle-password {
-  position: absolute;
-  right: 12px;
-  top: 36px;
-  cursor: pointer;
-  font-size: 18px;
-}
 
 .btn-login {
   width: 100%;
