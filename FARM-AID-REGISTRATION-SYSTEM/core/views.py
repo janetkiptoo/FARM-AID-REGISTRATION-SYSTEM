@@ -20,6 +20,7 @@ from .sms_utils import send_sms_notification
 from .models import Notification
 from .forms import NotificationForm
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.db.models import F
 
 
 import africastalking
@@ -239,10 +240,16 @@ def profile_update(request):
         form = FarmerUpdateForm(instance=farmer)
 
     return render(request, "core/profile_update.html", {"form": form, "farmer": farmer})
-
 def logout_view(request):
     logout(request)
     return redirect("login")
+
+
+def registered_farmers(request):
+    farmers = Farmer.objects.annotate(application_date=F('aidapplication__date_applied'))
+    return render(request, 'officer/farmers.html', {'farmers': farmers})
+    return render(request, 'officer/farmers.html', {'farmers': farmers})
+
 
 
 

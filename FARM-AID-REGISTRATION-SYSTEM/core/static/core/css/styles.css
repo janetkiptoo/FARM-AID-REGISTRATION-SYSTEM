@@ -1215,94 +1215,170 @@ footer {
     }
 }
 
-
-/* ---------- Page Layout ---------- */
+/* ===== Farmers Container ===== */
 .farmers-container {
-  max-width: 1100px;
-  margin: 40px auto;
+  width: 95%;
+  max-width: 1200px;
+  margin: 2rem auto;
   background: #ffffff;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  padding: 1.5rem 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  overflow-x: hidden; /* prevent side scroll */
 }
 
-.page-title {
-  text-align: center;
-  color: #2c3e50;
-  font-size: 2rem;
-  margin-bottom: 20px;
-}
-
-/* ---------- Search Bar ---------- */
-.search-form {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 25px;
-}
-
-.search-form input {
-  padding: 10px 14px;
-  border: 1px solid #ccc;
-  border-radius: 8px 0 0 8px;
-  width: 300px;
-  outline: none;
-  font-size: 1rem;
-}
-
-.search-form button {
-  background-color: #2d89ef;
-  border: none;
-  color: white;
-  padding: 10px 16px;
-  border-radius: 0 8px 8px 0;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.search-form button:hover {
-  background-color: #1b64b0;
-}
-
-/* ---------- Table Styling ---------- */
+/* ===== Table Styling ===== */
 .table-container {
+  width: 100%;
   overflow-x: auto;
 }
 
 .farmers-table {
   width: 100%;
+  table-layout: fixed; /* prevents columns from stretching unevenly */
   border-collapse: collapse;
+}
+
+.farmers-table th, .farmers-table td {
+  padding: 12px 10px;
+  text-align: left;
+  word-wrap: break-word;
   font-size: 0.95rem;
 }
 
-.farmers-table th,
-.farmers-table td {
-  padding: 12px 15px;
-  border-bottom: 1px solid #ddd;
+.farmers-table th:nth-child(1) { width: 5%; }
+.farmers-table th:nth-child(2) { width: 15%; }
+.farmers-table th:nth-child(3),
+.farmers-table th:nth-child(4),
+.farmers-table th:nth-child(5) { width: 13%; }
+.farmers-table th:nth-child(6),
+.farmers-table th:nth-child(7),
+.farmers-table th:nth-child(8) { width: 10%; }
+.farmers-table th:nth-child(9) { width: 14%; }
+
+
+/* ===== Aid Applications Page ===== */
+.table-container {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 2rem;
+  margin: 2rem auto;
+  width: 90%;
+  max-width: 1000px;
+}
+
+.page-title {
+  text-align: center;
+  font-size: 1.8rem;
+  color: #0d0e0d;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+
+/* Messages styling */
+.messages {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.message.success {
+  color: #2e7d32;
+  font-weight: 500;
+}
+
+.message.error {
+  color: #d32f2f;
+  font-weight: 500;
+}
+
+/* Table styling */
+.aid-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: "Poppins", sans-serif;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.aid-table th {
+  background-color: #2e7d32;
+  color: #fff;
   text-align: left;
-}
-
-.farmers-table th {
-  background-color: #2d89ef;
-  color: white;
+  padding: 12px 15px;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
+}
+
+.aid-table td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.aid-table tr:hover {
+  background-color: #f9fff9;
+  transition: 0.3s;
+}
+
+/* Status badges */
+.status-tag {
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-weight: 600;
   font-size: 0.9rem;
+  display: inline-block;
 }
 
-.farmers-table tr:nth-child(even) {
-  background-color: #f9f9f9;
+.status-approved {
+  background-color: #c8e6c9;
+  color: #256029;
 }
 
-.farmers-table tr:hover {
-  background-color: #f1f7ff;
-  transition: background-color 0.3s ease;
+.status-pending {
+  background-color: #fff3cd;
+  color: #856404;
 }
 
+.status-rejected {
+  background-color: #ffcdd2;
+  color: #b71c1c;
+}
+
+/* Action buttons */
+.action-btn {
+  padding: 6px 12px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: white;
+  font-weight: 500;
+  margin-right: 6px;
+  transition: 0.3s;
+}
+
+.action-btn.approve {
+  background-color: #2e7d32;
+}
+
+.action-btn.approve:hover {
+  background-color: #1b5e20;
+}
+
+.action-btn.reject {
+  background-color: #d32f2f;
+}
+
+.action-btn.reject:hover {
+  background-color: #b71c1c;
+}
+
+/* No data message */
 .no-data {
   text-align: center;
-  color: #7f8c8d;
+  color: #777;
   font-style: italic;
-  padding: 20px 0;
+  padding: 1rem 0;
 }
 
 /* ---------- Responsive Design ---------- */

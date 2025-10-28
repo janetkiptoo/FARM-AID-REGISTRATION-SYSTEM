@@ -26,7 +26,7 @@
         {% endfor %}
       </select>
 
-      <button type="submit">Filter</button>
+      <button type="submit" class="filter-btn">Filter</button>
       <a href="{% url 'officer_farmers' %}" class="reset-btn">Reset</a>
     </div>
   </form>
@@ -42,6 +42,7 @@
           <th>Phone</th>
           <th>Email</th>
           <th>County</th>
+          <th>Subcounty</th>
           <th>Ward</th>
           <th>Registration Date</th>
         </tr>
@@ -55,12 +56,13 @@
           <td>{{ farmer.phone_number }}</td>
           <td>{{ farmer.email }}</td>
           <td>{{ farmer.county }}</td>
+          <td>{{ farmer.sub_county }}</td>s
           <td>{{ farmer.ward }}</td>
           <td>{{ farmer.date_registered|date:"M d, Y" }}</td>
         </tr>
         {% empty %}
         <tr>
-          <td colspan="8" class="no-data">No farmers found.</td>
+          <td colspan="9" class="no-data">No farmers found.</td>
         </tr>
         {% endfor %}
       </tbody>

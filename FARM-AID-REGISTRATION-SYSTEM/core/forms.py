@@ -31,6 +31,7 @@ class FarmerForm(forms.ModelForm):
             "ward": forms.TextInput(attrs={"class": "form-control"}),
             "farm_size": forms.NumberInput(attrs={"class": "form-control"}),
             "farming_type": forms.Select(attrs={"class": "form-control"}),
+            
         }
 
 
