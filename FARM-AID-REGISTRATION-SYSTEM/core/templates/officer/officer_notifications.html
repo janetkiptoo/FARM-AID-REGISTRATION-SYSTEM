@@ -1,37 +1,51 @@
 {% extends "base_officer.html" %}
 {% load static %}
 {% block content %}
-
-
+  {% if messages %}
+        <ul>
+        {% for message in messages %}
+            <li>{{ message }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
 
 <div class="notifications-container">
 
-  <h2>📢 Send SMS Notification</h2>
+  <h2 class="title">📢 Send SMS Notification</h2>
 
   <div class="form-card">
-    <form method="POST" class="notification-form">
+    <form method="POST" class="notification-form" id="notificationForm">
       {% csrf_token %}
       
       <div class="form-group">
-        {{ form.recipient_type.label_tag }}
-        {{ form.recipient_type }}
+        <label for="recipient_type">Recipient Type:</label>
+        <select name="recipient_type" id="recipient_type" required>
+          <option value="">-- Select Recipient Type --</option>
+          <option value="single">Single Farmer</option>
+          <option value="all">All Farmers</option>
+        </select>
       </div>
 
-      <div id="phone-field" class="form-group">
-        {{ form.phone_number.label_tag }}
-        {{ form.phone_number }}
+      <div id="phone-field" class="form-group" style="display:none;">
+        <label for="phone_number">Phone Number:</label>
+        <input type="text" name="phone_number" id="phone_number" placeholder="e.g. 0712345678">
       </div>
 
       <div class="form-group">
-        {{ form.message.label_tag }}
-        {{ form.message }}
+        <label for="message">Message:</label>
+        <textarea name="message" id="message" rows="4" placeholder="Type your message here..." required></textarea>
       </div>
 
-      <button type="submit" class="btn-send">Send Notification</button>
+      <button type="submit" class="btn-send" id="sendBtn">
+        Send Notification
+      </button>
+
+      <!-- Spinner -->
+      <div id="spinner" class="spinner" style="display: none;"></div>
     </form>
   </div>
 
-  <h3>🕓 Recent Notifications</h3>
+  <h3 class="subtitle">🕓 Recent Notifications</h3>
 
   <div class="table-container">
     <table class="notifications-table">
@@ -43,37 +57,42 @@
           <th>Message</th>
         </tr>
       </thead>
-      <tbody>
-        {% for n in notifications %}
-        <tr>
-          <td>{{ n.date_sent|date:"Y-m-d H:i" }}</td>
-          <td>{{ n.recipient_type|title }}</td>
-          <td>{{ n.phone_number|default:"All" }}</td>
-          <td>{{ n.message }}</td>
-        </tr>
-        {% empty %}
-        <tr><td colspan="4" class="empty-row">No notifications sent yet.</td></tr>
-        {% endfor %}
-      </tbody>
+     <tbody>
+  {% for n in notifications %}
+  <tr>
+    <td>{{ n.date_sent|date:"Y-m-d H:i" }}</td>
+    <td>{{ n.get_recipient_type_display }}</td>
+    <td>{{ n.phone_number|default:"All" }}</td>
+    <td>{{ n.message }}</td>
+  </tr>
+  {% empty %}
+  <tr><td colspan="4" class="empty-row">No notifications sent yet.</td></tr>
+  {% endfor %}
+</tbody>
+
     </table>
   </div>
 </div>
 
 <script>
-  // Toggle phone field visibility when "All Farmers" is selected
-  const recipientField = document.querySelector("#id_recipient_type");
-  const phoneField = document.querySelector("#phone-field");
+  // Toggle phone field based on selection
+  const recipientType = document.getElementById("recipient_type");
+  const phoneField = document.getElementById("phone-field");
 
-  function togglePhoneField() {
-    if (recipientField.value === "all") {
-      phoneField.style.display = "none";
-    } else {
-      phoneField.style.display = "block";
-    }
-  }
+  recipientType.addEventListener("change", function () {
+    phoneField.style.display = this.value === "single" ? "block" : "none";
+  });
 
-  recipientField.addEventListener("change", togglePhoneField);
-  togglePhoneField(); // Run on page load
+  // Spinner when sending
+  const form = document.getElementById("notificationForm");
+  const sendBtn = document.getElementById("sendBtn");
+  const spinner = document.getElementById("spinner");
+
+  form.addEventListener("submit", function () {
+    sendBtn.disabled = true;
+    sendBtn.textContent = "Sending...";
+    spinner.style.display = "inline-block";
+  });
 </script>
 
 {% endblock %}

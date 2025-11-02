@@ -22,8 +22,9 @@ from .forms import NotificationForm
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import F
 
-
 import africastalking
+
+# use africastalking SDK's SMS client (AfricasTalkingGateway import removed)
 
 username = "sandbox"
 api_key = "atsk_5b254d369598cb7309f0e80d7faed886f687a79ae551d0cf2d6a0d517fd28a46a4ad4c47"
@@ -288,27 +289,60 @@ def send_sms_notification(recipients, message):
         print("❌ SMS error:", e)
         return None
 
+def format_phone_number(phone):
+    phone = phone.strip().replace(" ", "").replace("-", "")
+    if phone.startswith("0"):
+        phone = "+254" + phone[1:]
+    elif phone.startswith("7"):
+        phone = "+254" + phone
+    elif not phone.startswith("+"):
+        phone = "+254" + phone
+    return phone
+
 def officer_notifications(request):
+    notifications = Notification.objects.all().order_by("-date_sent")[:10]
+
     if request.method == "POST":
-        form = NotificationForm(request.POST)
-        if form.is_valid():
-            recipient_type = form.cleaned_data['recipient_type']
-            phone_number = form.cleaned_data['phone_number']
-            message = form.cleaned_data['message']
+        recipient_type = request.POST.get("recipient_type")
+        phone_number = request.POST.get("phone_number")
+        message = request.POST.get("message")
 
-            if recipient_type == 'single' and phone_number:
-                send_sms_notification(phone_number, message)
-                messages.success(request, f"✅ SMS sent successfully to {phone_number}")
-            elif recipient_type == 'all':
-                farmers = Farmer.objects.all()
-                for farmer in farmers:
-                    send_sms_notification(farmer.phone_number, message)
-                messages.success(request, f"✅ SMS sent to all farmers ({farmers.count()} total)")
-            else:
-                messages.error(request, "⚠️ Please select a valid recipient or enter a phone number.")
+        if recipient_type == "single" and phone_number:
+            # Send to one farmer
+            formatted_number = format_phone_number(phone_number)
+            try:
+                response = sms.send(message, [formatted_number])
+                Notification.objects.create(
+                    recipient_type="single",
+                    phone_number=formatted_number,
+                    message=message
+                )
+                print(f"✅ SMS sent to {formatted_number}: {response}")
+                messages.success(request, f"Message sent to {formatted_number}")
+            except Exception as e:
+                print(f"❌ SMS error: {e}")
+                messages.error(request, f"Error sending message: {e}")
 
-            return redirect('officer_notifications')
-    else:
-        form = NotificationForm()
+        elif recipient_type == "all":
+            # Send to all farmers
+            farmers = Farmer.objects.all()
+            for farmer in farmers:
+                phone_attr = getattr(farmer, "phone_number", None) or getattr(farmer, "phone", None)
+                if not phone_attr:
+                    continue
+                formatted_number = format_phone_number(phone_attr)
+                try:
+                    response = sms.send(message, [formatted_number])
+                    Notification.objects.create(
+                        recipient_type="all",
+                        phone_number=formatted_number,
+                        message=message
+                    )
+                    print(f"✅ SMS sent to {formatted_number}: {response}")
+                except Exception as e:
+                    print(f"❌ SMS error to {formatted_number}: {e}")
+            messages.success(request, "Message sent to all farmers!")
 
-    return render(request, 'officer/officer_notifications.html', {'form': form})
+        return redirect("officer_notifications")
+
+    return render(request, "officer/officer_notifications.html", {"notifications": notifications})

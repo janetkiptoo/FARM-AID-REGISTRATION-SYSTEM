@@ -1,3 +1,4 @@
+from email.policy import default
 from django.db import models
 
 from django import forms
@@ -106,18 +107,24 @@ class FarmerUpdateForm(forms.ModelForm):
             "farm_size": forms.NumberInput(attrs={"step": "0.01", "class": "form-control"}),
         }
 
+
 class Notification(models.Model):
+    RECIPIENT_CHOICES = [
+        ("single", "Single Farmer"),
+        ("all", "All Farmers"),
+    ]
+
+    recipient_type = models.CharField(max_length=10, choices=RECIPIENT_CHOICES, default="single")
+    phone_number = models.CharField(max_length=20, blank=True, null=True)
     message = models.TextField()
-    sent_to_all = models.BooleanField(default=False)
-    recipients = models.ManyToManyField(Farmer, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    date_sent = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Notification ({'All Farmers' if self.sent_to_all else 'Selected Farmers'})"
-
+        return f"{self.get_recipient_type_display()} - {self.phone_number or 'All'}"
+    
+    
 class User(AbstractUser):
-   
- is_officer = models.BooleanField(default=False)
+    is_officer = models.BooleanField(default=False)
 
 def __str__(self):
         return self.username
