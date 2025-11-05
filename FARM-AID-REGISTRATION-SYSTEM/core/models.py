@@ -79,6 +79,7 @@ class AidApplication(models.Model):
             ('pending', 'Pending'),
             ('approved', 'Approved'),
             ('rejected', 'Rejected'),
+            ('cancelled', 'Cancelled'),
         ],
         default='pending'
     )

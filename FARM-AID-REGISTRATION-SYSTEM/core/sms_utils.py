@@ -2,7 +2,7 @@ import africastalking
 from core.models import Farmer  # Make sure you have this model in your app
 
 # Initialize Africa's Talking
-username = "sandbox"  # Change when going live
+username = "messaging system"  # Change when going live
 api_key = "atsk_5b254d369598cb7309f0e80d7faed886f687a79ae551d0cf2d6a0d517fd28a46a4ad4c47"
 africastalking.initialize(username, api_key)
 

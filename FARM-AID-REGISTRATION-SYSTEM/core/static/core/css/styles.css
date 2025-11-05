@@ -605,7 +605,7 @@ input[type="text"], input[type="email"], input[type="password"] {
 .status.pending { color: orange; font-weight: bold; }
 .status.approved { color: green; font-weight: bold; }
 .status.rejected { color: red; font-weight: bold; }
-
+.status.cancelled { color: #3f105e; font-weight: bold; }
 
 
 .btn {

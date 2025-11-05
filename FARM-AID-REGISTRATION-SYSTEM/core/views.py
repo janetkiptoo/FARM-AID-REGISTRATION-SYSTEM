@@ -13,6 +13,10 @@ from .models import AidApplication, Farmer
 from .forms import FarmerForm, AidApplicationForm
 from django.contrib import messages
 from .models import ContactMessage
+from .models import AidApplication
+from .models import AidApplication
+
+
 from .forms import FarmerUpdateForm
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import HttpResponse
@@ -21,6 +25,8 @@ from .models import Notification
 from .forms import NotificationForm
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import F
+
+
 
 import africastalking
 
@@ -144,16 +150,27 @@ def dashboard(request):
     }
     return render(request, "core/dashboard.html", context)
 
-
 @login_required
-def delete_application(request, app_id):
-    application = get_object_or_404(AidApplication, id=app_id, farmer__user=request.user)
-    if application.status == 'pending':
-        application.delete()
-        messages.success(request, "Your application has been deleted successfully.")
+def cancel_application(request, application_id):
+    try:
+        farmer = request.user.farmer
+    except Farmer.DoesNotExist:
+        messages.error(request, "You are not authorized to cancel this application.")
+        return redirect("login")
+
+    application = get_object_or_404(AidApplication, id=application_id, farmer=farmer)
+
+    if application.status == "pending":
+        application.status = "cancelled"
+        application.save()
+        messages.success(request, "Application has been cancelled successfully.")
     else:
-        messages.error(request, "You can only delete applications that are still pending.")
-    return redirect('dashboard')
+        messages.warning(request, "Only pending applications can be cancelled.")
+
+    return redirect("status", id_number=farmer.id_number)
+
+
+
 
 
 
@@ -167,20 +184,36 @@ def status_view(request, id_number):
     })
 
 @login_required
-def reapply_application(request, app_id):
-    from django.contrib import messages
-    from django.shortcuts import redirect, get_object_or_404
+def reapply_application(request, application_id):
+    try:
+        farmer = request.user.farmer
+    except Farmer.DoesNotExist:
+        messages.error(request, "You are not authorized to reapply.")
+        return redirect("login")
 
-    application = get_object_or_404(AidApplication, id=app_id, farmer__user=request.user)
-    
-    if application.status == 'rejected':
-        messages.info(request, "You can now reapply for aid. Please fill out the form again.")
-        return redirect('apply_aid')  # make sure this name matches your application form URL name
-    else:
-        messages.error(request, "You can only reapply for rejected applications.")
-        return redirect('application_status')
+    # Fetch the original application
+    old_application = get_object_or_404(AidApplication, id=application_id, farmer=farmer)
 
+    # ✅ Check if this farmer has already reapplied based on the same original application
+    existing_reapplication = AidApplication.objects.filter(
+        farmer=farmer,
+        resources_needed=old_application.resources_needed,
+        status="pending"
+    ).exclude(id=old_application.id).exists()
 
+    if existing_reapplication:
+        messages.warning(request, "You have already reapplied for this aid. You can only reapply once.")
+        return redirect("status", id_number=farmer.id_number)
+
+    # ✅ Otherwise, allow one reapplication
+    new_application = AidApplication.objects.create(
+        farmer=farmer,
+        resources_needed=old_application.resources_needed,
+        status="pending"
+    )
+
+    messages.success(request, "Your application has been reapplied successfully.")
+    return redirect("status", id_number=farmer.id_number)
 
 
 def index(request):
@@ -346,3 +379,6 @@ def officer_notifications(request):
         return redirect("officer_notifications")
 
     return render(request, "officer/officer_notifications.html", {"notifications": notifications})
+
+
+
