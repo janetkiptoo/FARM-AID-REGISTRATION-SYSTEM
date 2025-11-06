@@ -1,0 +1,43 @@
+{% extends "base_officer.html" %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'core/css/styles.css' %}">
+<div class="officer-container">
+  <h2>📩 Farmer Messages</h2>
+
+  {% if messages_list %}
+  <table class="officer-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Message</th>
+        <th>Reply</th>
+        <th>Replied By</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for msg in messages_list %}
+      <tr>
+        <td>{{ msg.name }}</td>
+        <td>{{ msg.email }}</td>
+        <td>{{ msg.message }}</td>
+        <td>
+          {% if msg.reply %}
+            ✅ {{ msg.reply }}
+          {% else %}
+            <a href="{% url 'reply_message' msg.id %}" class="btn">Reply</a>
+          {% endif %}
+        </td>
+        <td>{{ msg.replied_by }}</td>
+        <td>{{ msg.created_at|date:"M d, Y" }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>No messages yet.</p>
+  {% endif %}
+</div>
+{% endblock %}

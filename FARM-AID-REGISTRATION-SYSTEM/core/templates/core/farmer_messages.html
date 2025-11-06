@@ -1,0 +1,98 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="messages-container">
+  <h2 class="page-title">📩 Your Support Messages</h2>
+
+  {% if messages_list %}
+    <div class="message-list">
+      {% for msg in messages_list %}
+        <div class="message-card {% if msg.reply and not msg.is_reply_seen %}new-reply{% endif %}">
+          <div class="message-header">
+            <strong>Sent on:</strong> {{ msg.created_at|date:"M d, Y H:i" }}
+          </div>
+
+          <div class="message-body">
+            <p><strong>Your Message:</strong></p>
+            <p>{{ msg.message }}</p>
+          </div>
+
+          {% if msg.reply %}
+            <hr>
+            <div class="reply-section">
+              <p><strong>Officer’s Reply:</strong></p>
+              <p>{{ msg.reply }}</p>
+              <small><em>— {{ msg.replied_by.username }} on {{ msg.replied_at|date:"M d, Y H:i" }}</em></small>
+            </div>
+
+            {% if not msg.is_reply_seen %}
+              <span class="new-badge">New Reply ✨</span>
+            {% endif %}
+          {% else %}
+            <p class="pending">⏳ Awaiting reply...</p>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="no-messages">You haven’t sent any messages yet.</p>
+  {% endif %}
+</div>
+
+<style>
+.messages-container {
+  max-width: 800px;
+  margin: 40px auto;
+  background: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.page-title {
+  text-align: center;
+  color: #2f5e3f;
+  margin-bottom: 20px;
+}
+
+.message-card {
+  border: 1px solid #ddd;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  background: #f9f9f9;
+}
+
+.message-card.new-reply {
+  border-left: 5px solid #2e8b57;
+  background: #eef9f0;
+}
+
+.reply-section {
+  background: #f1f1f1;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.new-badge {
+  display: inline-block;
+  margin-top: 8px;
+  color: #fff;
+  background: #2e8b57;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 13px;
+}
+
+.pending {
+  color: #999;
+  font-style: italic;
+}
+
+.no-messages {
+  text-align: center;
+  color: #777;
+}
+</style>
+{% endblock %}

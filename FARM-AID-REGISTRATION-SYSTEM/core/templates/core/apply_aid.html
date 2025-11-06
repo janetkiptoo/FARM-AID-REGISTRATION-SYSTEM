@@ -7,10 +7,7 @@
     <h2>Apply for Aid</h2>
     <p>Please fill out the form below to apply for aid.</p>
 
-
-
-
-    <!-- Show conditional messages -->
+    <!-- Display messages -->
     {% if messages %}
         <div class="messages">
             {% for message in messages %}
@@ -18,6 +15,49 @@
             {% endfor %}
         </div>
     {% endif %}
+
+    <!-- Show aid availability and deadlines -->
+    <div class="aid-availability">
+        <h3>Available Aid Resources</h3>
+        <table class="availability-table">
+            <thead>
+                <tr>
+                    <th>Resource</th>
+                    <th>Quantity Available</th>
+                    <th>Application Opens</th>
+                    <th>Application Deadline</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in available_items %}
+                    <tr>
+                        <td>{{ item.get_name_display }}</td>
+                        <td>
+                            {% if item.quantity_available > 0 %}
+                                {{ item.quantity_available }}
+                            {% else %}
+                                <span style="color: red;">Out of stock</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ item.start_date|date:"M d, Y" }}</td>
+                        <td>{{ item.deadline|date:"M d, Y" }}</td>
+                        <td>
+                            {% if item.is_open_for_application %}
+                                <span style="color: green;">Open</span>
+                            {% else %}
+                                <span style="color: gray;">Closed</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5" style="text-align:center;">No aid items available at the moment.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div><br>
 
     <form method="POST" class="apply-form">
         {% csrf_token %}
@@ -41,4 +81,47 @@
         </div>
     </form>
 </div>
+
+<style>
+.apply-aid-container {
+    max-width: 900px;
+    margin: 30px auto;
+    background: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.availability-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+.availability-table th, .availability-table td {
+    border: 1px solid #ddd;
+    padding: 8px 10px;
+    text-align: center;
+}
+.availability-table th {
+    background: #4CAF50;
+    color: white;
+}
+.form-box {
+    border: 1px solid #ccc;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+.btn-submit {
+    background: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.btn-submit:hover {
+    background: #43a047;
+}
+</style>
 {% endblock %}

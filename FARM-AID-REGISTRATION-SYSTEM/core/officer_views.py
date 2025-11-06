@@ -2,6 +2,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .models import Farmer, AidApplication, Notification
 from django.contrib import messages
+from django.utils import timezone
+from .models import ContactMessage
+from django.contrib import messages
 
 # Helper decorator — only officers can access these views
 def officer_required(view_func):
@@ -62,3 +65,6 @@ def update_application_status(request, application_id, status):
         messages.error(request, "Invalid status value.")
 
     return redirect('officer_applications')
+
+
+

@@ -22,6 +22,15 @@
       <a href="{% url 'officer_dashboard' %}" class="{% if request.resolver_match.url_name == 'officer_dashboard' %}active{% endif %}">Dashboard</a>
       <a href="{% url 'officer_farmers' %}" class="{% if request.resolver_match.url_name == 'officer_farmers' %}active{% endif %}">Farmers</a>
       <a href="{% url 'officer_applications' %}" class="{% if request.resolver_match.url_name == 'officer_applications' %}active{% endif %}">Applications</a>
+     {% if user.is_authenticated %}
+    {% if user.is_staff or user.is_officer %}
+        <a href="{% url 'aid_inventory_dashboard' %}" class="{% if request.resolver_match.url_name == 'aid_inventory_dashboard' %}active{% endif %}">Aid Inventory</a>
+    {% endif %}
+{% endif %}
+
+
+
+       <a href="{% url 'view_messages' %}" class="{% if request.resolver_match.url_name == 'view_messages' %}active{% endif %}">Messages</a>
       <a href="{% url 'officer_notifications' %}" class="{% if request.resolver_match.url_name == 'officer_notifications' %}active{% endif %}">Notifications</a>
       <a href="{% url 'officer_logout' %}" class="logout-btn">Logout</a>
     </div>

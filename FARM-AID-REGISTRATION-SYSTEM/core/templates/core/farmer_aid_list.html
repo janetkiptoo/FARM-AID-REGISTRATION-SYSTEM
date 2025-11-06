@@ -1,0 +1,31 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<h2>Available Aid Items</h2>
+
+<table border="1" cellpadding="8">
+    <tr>
+        <th>Item</th>
+        <th>Description</th>
+        <th>Quantity Available</th>
+        <th>Application Window</th>
+        <th>Status</th>
+    </tr>
+    {% for aid in aids %}
+    <tr>
+        <td>{{ aid.get_name_display }}</td>
+        <td>{{ aid.description }}</td>
+        <td>{{ aid.quantity_available }}</td>
+        <td>{{ aid.application_start }} → {{ aid.application_deadline }}</td>
+        <td>
+            {% if aid.is_open_for_application %}
+                <span style="color: green;">Open</span>
+            {% else %}
+                <span style="color: red;">Closed</span>
+            {% endif %}
+        </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="5">No aid items available right now.</td></tr>
+    {% endfor %}
+</table>
+{% endblock %}

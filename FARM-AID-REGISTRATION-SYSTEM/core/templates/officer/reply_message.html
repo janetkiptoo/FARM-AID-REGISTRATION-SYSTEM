@@ -1,0 +1,17 @@
+{% extends "base_officer.html" %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'core/css/styles.css' %}">
+<div class="officer-container">
+  <h2>💬 Reply to {{ msg.name }}</h2>
+  <p><strong>Email:</strong> {{ msg.email }}</p>
+  <p><strong>Message:</strong> {{ msg.message }}</p>
+
+  <form method="POST" class="reply-form">
+    {% csrf_token %}
+    <label for="reply">Your Reply:</label><br>
+    <textarea name="reply" id="reply" rows="5" required>{{ msg.reply }}</textarea><br><br>
+    <button type="submit" class="btn">Send Reply</button>
+  </form>
+</div>
+{% endblock %}

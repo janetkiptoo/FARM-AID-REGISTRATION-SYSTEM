@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}Aid Inventory Dashboard{% endblock %}
+
+{% block content %}
+<div class="inventory-dashboard">
+    <h2>🧾 Aid Inventory Dashboard</h2>
+    <p>Monitor available aid resources, stock levels, and application periods.</p>
+
+    <table class="inventory-table">
+        <thead>
+            <tr>
+                <th>Resource</th>
+                <th>Quantity Available</th>
+                <th>Application Opens</th>
+                <th>Application Deadline</th>
+                <th>Status</th>
+                <th>Actions</th>
+                <th>Alerts</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in aid_items %}
+                <tr
+                    {% if item.quantity_available <= 5 %}
+                        style="background: #fff8e1;"
+                    {% endif %}
+                >
+                    <td>{{ item.get_name_display }}</td>
+                    <td>{{ item.quantity_available }}</td>
+                    <td>{{ item.start_date|date:"M d, Y" }}</td>
+                    <td>{{ item.deadline|date:"M d, Y" }}</td>
+                    <td>
+                        {% if item.is_open_for_application %}
+                            <span style="color: green;">Open</span>
+                        {% else %}
+                            <span style="color: gray;">Closed</span>
+                        {% endif %}
+                    </td>
+                    <td>
+    <a href="{% url 'edit_aid_item' item.id %}" class="btn-edit">Edit</a>
+</td>
+                    <td>
+                        {% if item.quantity_available <= 0 %}
+                            <span style="color: red; font-weight: bold;">Out of stock</span>
+                        {% elif item.quantity_available <= 5 %}
+                            <span style="color: orange;">Low stock</span>
+                        {% else %}
+                            <span style="color: green;">Sufficient</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% empty %}
+            
+                <tr>
+                    <td colspan="6" style="text-align:center;">No aid items available yet.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<style>
+.inventory-dashboard {
+    max-width: 1000px;
+    margin: 30px auto;
+    background: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.inventory-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+.inventory-table th, .inventory-table td {
+    border: 1px solid #ddd;
+    padding: 8px 10px;
+    text-align: center;
+}
+.inventory-table th {
+    background: #4CAF50;
+    color: white;
+}
+
+.btn-edit {
+    background: #4CAF50;
+    color: white;
+    padding: 6px 12px;
+    text-decoration: none;
+    border-radius: 5px;
+}
+.btn-edit:hover {
+    background: #388E3C;
+}
+
+</style>
+{% endblock %}

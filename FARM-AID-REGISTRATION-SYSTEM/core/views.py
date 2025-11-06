@@ -1,3 +1,6 @@
+from mailbox import Message
+from django.utils import timezone
+
 from urllib import request
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -9,12 +12,8 @@ User = get_user_model()
 from django.contrib import messages
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from .models import AidApplication, Farmer
+from .models import AidApplication, Farmer, ContactMessage
 from .forms import FarmerForm, AidApplicationForm
-from django.contrib import messages
-from .models import ContactMessage
-from .models import AidApplication
-from .models import AidApplication
 
 
 from .forms import FarmerUpdateForm
@@ -25,6 +24,9 @@ from .models import Notification
 from .forms import NotificationForm
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import F
+from .forms import AidItemForm
+from .models import AidItem
+
 
 
 
@@ -45,21 +47,18 @@ applications = []  # temporary store (replace with DB model later)
 
 
 
-
-# Farmer registration + Aid application
-@login_required
 def apply_aid(request):
     """
     Combined Farmer registration/update + Aid application view.
     """
-    # Try to get the farmer profile for the logged-in user
     farmer = Farmer.objects.filter(user=request.user).first()
+    available_items = AidItem.objects.all()
 
     if request.method == "POST":
         farmer_form = FarmerForm(request.POST, instance=farmer)
         aid_form = AidApplicationForm(request.POST)
 
-        # Save or update farmer profile
+        # ✅ Step 1: Save or update farmer info
         if farmer_form.is_valid():
             farmer = farmer_form.save(commit=False)
             farmer.user = request.user
@@ -68,11 +67,32 @@ def apply_aid(request):
         else:
             messages.error(request, "Please correct the farmer info errors.")
 
-        # Save aid application if farmer exists
+        # ✅ Step 2: Process aid application
         if farmer and aid_form.is_valid():
             resource = aid_form.cleaned_data["resources_needed"]
+            aid_item = AidItem.objects.filter(name=resource).first()
 
-            # Prevent duplicate active applications
+            if not aid_item:
+                messages.error(request, "The selected aid item does not exist.")
+                return redirect("apply_aid")
+
+            # ✅ Check if the application window is open
+            if not aid_item.is_open_for_application():
+                messages.error(
+                    request,
+                    f"Applications for {aid_item.get_name_display()} are currently closed."
+                )
+                return redirect("apply_aid")
+
+            # ✅ Check stock availability
+            if aid_item.quantity_available <= 0:
+                messages.error(
+                    request,
+                    f"{aid_item.get_name_display()} is out of stock."
+                )
+                return redirect("apply_aid")
+
+            # ✅ Prevent duplicate applications (pending/approved)
             existing_application = AidApplication.objects.filter(
                 farmer=farmer,
                 resources_needed=resource
@@ -81,25 +101,36 @@ def apply_aid(request):
             if existing_application:
                 messages.error(
                     request,
-                    f"You already have an active application for {resource}. Please wait for it to be processed."
+                    f"You already have an active application for {aid_item.get_name_display()}."
                 )
-            else:
-                aid_application = aid_form.save(commit=False)
-                aid_application.farmer = farmer
-                aid_application.save()
-                messages.success(request, "Aid application submitted successfully ✅")
+                return redirect("apply_aid")
 
-            return redirect("dashboard")  # after submission, go to dashboard
+            # ✅ Create aid application
+            AidApplication.objects.create(
+                farmer=farmer,
+                resources_needed=resource,
+                aid_item=aid_item
+            )
+
+            messages.success(
+                request,
+                f"Your application for {aid_item.get_name_display()} has been submitted successfully ✅"
+            )
+            return redirect("dashboard")
 
     else:
         farmer_form = FarmerForm(instance=farmer)
         aid_form = AidApplicationForm()
 
-    return render(
-        request,
-        "core/apply_aid.html",
-        {"farmer_form": farmer_form, "aid_form": aid_form, "farmer": farmer}
-    )
+    context = {
+        "farmer_form": farmer_form,
+        "aid_form": aid_form,
+        "available_items": available_items,
+        "farmer": farmer,
+    }
+
+    return render(request, "core/apply_aid.html", context)
+
 
 def notify_farmer(aid_application, message):
     farmer = aid_application.farmer
@@ -382,3 +413,100 @@ def officer_notifications(request):
 
 
 
+
+@login_required
+def view_messages(request):
+    if request.user.is_officer or request.user.is_staff:
+        messages_list = ContactMessage.objects.all().order_by("-created_at")
+    else:
+        # Optional: if farmers should see their own messages
+        messages_list = ContactMessage.objects.filter(email=request.user.email)
+    return render(request, "officer/view_messages.html", {"messages_list": messages_list})
+
+
+
+
+@login_required
+def reply_message(request, message_id):
+    msg = get_object_or_404(ContactMessage, id=message_id)
+    
+    if request.method == "POST":
+        reply_text = request.POST.get("reply")
+        msg.reply = reply_text
+        msg.replied_by = request.user
+        msg.replied_at = timezone.now()
+        msg.is_reply_seen = False  # 👈 farmer hasn’t seen the new reply yet
+        msg.save()
+        messages.success(request, "Reply sent successfully.")
+        return redirect("view_messages")
+
+    return render(request, "officer/reply_message.html", {"msg": msg})
+
+@login_required
+def farmer_messages(request):
+    messages_list = ContactMessage.objects.filter(email=request.user.email).order_by('-created_at')
+
+    # Mark unseen replies as seen
+    unseen_replies = messages_list.filter(reply__isnull=False, is_reply_seen=False)
+    unseen_replies.update(is_reply_seen=True)
+
+    return render(request, "core/farmer_messages.html", {"messages_list": messages_list})
+
+
+
+
+@login_required
+def available_aid(request):
+    """View for farmers to see available aids."""
+    aids = AidItem.objects.all().order_by('name')
+    return render(request, "core/farmer_aid_list.html", {"aids": aids})
+
+
+def is_officer(user):
+    return user.is_authenticated and user.role in ['officer', 'admin']  # adjust as per your model
+
+
+@login_required
+@user_passes_test(is_officer)
+def manage_aid_inventory(request):
+    """View for officers/admin to manage aid stock."""
+    aids = AidItem.objects.all().order_by('-updated_at')
+    return render(request, "core/manage_aid_inventory.html", {"aids": aids})
+
+
+# Restrict access to only officers and admins
+def is_officer_or_admin(user):
+    return user.is_authenticated and (user.is_officer or user.is_staff)
+
+
+@login_required
+@user_passes_test(is_officer_or_admin)
+def aid_inventory_dashboard(request):
+    """
+    View for officers and admins to monitor aid stock levels and application periods.
+    """
+    aid_items = AidItem.objects.all().order_by('name')
+    return render(request, "core/aid_inventory_dashboard.html", {"aid_items": aid_items})
+
+
+
+@login_required
+@user_passes_test(is_officer_or_admin)
+def edit_aid_item(request, item_id):
+    """
+    Allow officers/admins to edit quantity and dates of aid items.
+    """
+    aid_item = get_object_or_404(AidItem, id=item_id)
+
+    if request.method == "POST":
+        form = AidItemForm(request.POST, instance=aid_item)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f"{aid_item.get_name_display()} updated successfully ✅")
+            return redirect("aid_inventory_dashboard")
+        else:
+            messages.error(request, "Please correct the errors below.")
+    else:
+        form = AidItemForm(instance=aid_item)
+
+    return render(request, "core/edit_aid_item.html", {"form": form, "aid_item": aid_item})

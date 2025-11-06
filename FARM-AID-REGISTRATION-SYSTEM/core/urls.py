@@ -24,6 +24,14 @@ path("farmers_map/data/", views.farmers_map_data, name="farmers_map_data"),
     path('officer/notifications/', views.officer_notifications, name='officer_notifications'),
 
     path('officer/application/<int:application_id>/<str:status>/', officer_views.update_application_status, name='update_application_status'),
+   path('officer/messages/', views.view_messages, name='view_messages'),
+path('officer/message/<int:message_id>/reply/', views.reply_message, name='reply_message'),
+   path('farmer/messages/', views.farmer_messages, name='farmer_messages'),
+path('farmer/available-aid/', views.available_aid, name='available_aid'),
+path('officer/manage-aid/', views.manage_aid_inventory, name='manage_aid_inventory'),
+path("officer/aid-inventory/", views.aid_inventory_dashboard, name="aid_inventory_dashboard"),
+path("officer/aid-inventory/edit/<int:item_id>/", views.edit_aid_item, name="edit_aid_item"),
+
 
 ]
 

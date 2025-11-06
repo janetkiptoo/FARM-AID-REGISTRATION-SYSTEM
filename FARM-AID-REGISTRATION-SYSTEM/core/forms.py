@@ -2,6 +2,7 @@ from django import forms
 from .models import Farmer, AidApplication
 from .models import Notification
 from .models import Farmer
+from .models import AidItem
 class NotificationForm(forms.Form):
     ...
 
@@ -79,3 +80,15 @@ class NotificationForm(forms.Form):
     recipient_type = forms.ChoiceField(choices=RECIPIENT_CHOICES, label="Send To")
     phone_number = forms.CharField(max_length=15, required=False, label="Phone Number (for single)")
     message = forms.CharField(widget=forms.Textarea, label="Message")
+
+
+    
+class AidItemForm(forms.ModelForm):
+    class Meta:
+        model = AidItem
+        fields = ["quantity_available", "application_start", "application_deadline"]
+        widgets = {
+            "quantity_available": forms.NumberInput(attrs={"class": "form-control", "min": "0"}),
+            "application_start": forms.DateInput(attrs={"type": "date", "class": "form-control"}),
+            "application_deadline": forms.DateInput(attrs={"type": "date", "class": "form-control"}),
+        }
