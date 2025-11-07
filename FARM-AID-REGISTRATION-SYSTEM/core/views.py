@@ -14,6 +14,7 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from .models import AidApplication, Farmer, ContactMessage
 from .forms import FarmerForm, AidApplicationForm
+from .models import SubAidItem
 
 
 from .forms import FarmerUpdateForm
@@ -45,14 +46,12 @@ import json
 
 applications = []  # temporary store (replace with DB model later)
 
-
-
 def apply_aid(request):
     """
-    Combined Farmer registration/update + Aid application view.
+    Combined Farmer registration/update + Aid application view with sub-items and quantity tracking.
     """
     farmer = Farmer.objects.filter(user=request.user).first()
-    available_items = AidItem.objects.all()
+    available_items = AidItem.objects.all()  # e.g., Seedlings, Fertilizer, etc.
 
     if request.method == "POST":
         farmer_form = FarmerForm(request.POST, instance=farmer)
@@ -69,15 +68,12 @@ def apply_aid(request):
 
         # ✅ Step 2: Process aid application
         if farmer and aid_form.is_valid():
-            resource = aid_form.cleaned_data["resources_needed"]
-            aid_item = AidItem.objects.filter(name=resource).first()
-
-            if not aid_item:
-                messages.error(request, "The selected aid item does not exist.")
-                return redirect("apply_aid")
+            sub_aid_item = aid_form.cleaned_data["sub_aid_item"]
+            aid_item = sub_aid_item.aid_item
+            quantity_requested = aid_form.cleaned_data["quantity_requested"]
 
             # ✅ Check if the application window is open
-            if not aid_item.is_open_for_application():
+            if not aid_item.is_open_for_application:
                 messages.error(
                     request,
                     f"Applications for {aid_item.get_name_display()} are currently closed."
@@ -85,36 +81,46 @@ def apply_aid(request):
                 return redirect("apply_aid")
 
             # ✅ Check stock availability
-            if aid_item.quantity_available <= 0:
+            if sub_aid_item.quantity_available < quantity_requested:
                 messages.error(
                     request,
-                    f"{aid_item.get_name_display()} is out of stock."
+                    f"Only {sub_aid_item.quantity_available} {sub_aid_item.name} available. "
+                    "Please request a smaller quantity."
                 )
                 return redirect("apply_aid")
 
-            # ✅ Prevent duplicate applications (pending/approved)
+            # ✅ Prevent duplicate applications
             existing_application = AidApplication.objects.filter(
                 farmer=farmer,
-                resources_needed=resource
+                sub_aid_item=sub_aid_item
             ).exclude(status="rejected").exists()
 
             if existing_application:
                 messages.error(
                     request,
-                    f"You already have an active application for {aid_item.get_name_display()}."
+                    f"You already have an active application for {sub_aid_item.name}."
                 )
                 return redirect("apply_aid")
 
-            # ✅ Create aid application
+            # ✅ Create the aid application
             AidApplication.objects.create(
                 farmer=farmer,
-                resources_needed=resource,
-                aid_item=aid_item
+                aid_item=aid_item,
+                sub_aid_item=sub_aid_item,
+                quantity_requested=quantity_requested,
             )
+
+            # ✅ Reduce stock correctly at both sub and main item levels
+            sub_aid_item.quantity_available -= quantity_requested
+            sub_aid_item.save()
+
+            if hasattr(aid_item, "quantity_available"):
+                aid_item.quantity_available = max(aid_item.quantity_available - quantity_requested, 0)
+                aid_item.save()
 
             messages.success(
                 request,
-                f"Your application for {aid_item.get_name_display()} has been submitted successfully ✅"
+                f"Your application for {quantity_requested} {sub_aid_item.name} has been submitted successfully ✅"
             )
             return redirect("dashboard")
 
@@ -130,6 +136,9 @@ def apply_aid(request):
     }
 
     return render(request, "core/apply_aid.html", context)
+
+
+
 
 
 def notify_farmer(aid_application, message):
@@ -245,6 +254,11 @@ def reapply_application(request, application_id):
 
     messages.success(request, "Your application has been reapplied successfully.")
     return redirect("status", id_number=farmer.id_number)
+
+def get_sub_items(request, aid_item_id):
+    sub_items = SubAidItem.objects.filter(aid_item_id=aid_item_id)
+    data = {'sub_items': [{'id': s.id, 'name': s.name} for s in sub_items]}
+    return JsonResponse(data)
 
 
 def index(request):

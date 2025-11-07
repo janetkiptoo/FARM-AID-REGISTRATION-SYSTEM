@@ -11,11 +11,17 @@ class FarmerAdmin(admin.ModelAdmin):
 
 @admin.register(AidApplication)
 class AidApplicationAdmin(admin.ModelAdmin):
-    list_display = ("farmer", "resources_needed", "status", "colored_status", "applied_at")
+    list_display = ("farmer", "aid_item", "status", "colored_status", "applied_at")
+
     list_display_links = ("farmer",)
     list_filter = ("status", "applied_at")
     list_editable = ("status",)
     search_fields = ("farmer__full_name", "resources_needed", "status")
+
+    
+    def resources_needed(self, obj):
+        return obj.aid_item.name  # or obj.aid_item.item_type etc.
+    resources_needed.short_description = "Resources Needed"
 
     def colored_status(self, obj):
         color = {
@@ -51,6 +57,10 @@ class AidItemAdmin(admin.ModelAdmin):
     list_display = ('name', 'application_start', 'application_deadline', 'is_open_for_application')
     list_filter = ('name',)
     inlines = [SubAidItemInline]
+
+    def get_subitems(self, obj):
+        return ", ".join(obj.subitems)
+    get_subitems.short_description = "Sub-Items"
 
     def colored_quantity(self, obj):
         """Show quantity in color depending on availability"""

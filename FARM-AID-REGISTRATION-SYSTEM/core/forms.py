@@ -3,6 +3,7 @@ from .models import Farmer, AidApplication
 from .models import Notification
 from .models import Farmer
 from .models import AidItem
+from .models import AidApplication, AidItem, SubAidItem
 class NotificationForm(forms.Form):
     ...
 
@@ -36,14 +37,28 @@ class FarmerForm(forms.ModelForm):
         }
 
 
+
 class AidApplicationForm(forms.ModelForm):
     class Meta:
         model = AidApplication
-        fields = ["resources_needed"]
+        fields = ["aid_item", "sub_aid_item", "quantity_requested"]
         widgets = {
-            "resources_needed": forms.Select(attrs={"class": "form-control"}),
+            'aid_item': forms.Select(attrs={'class': 'form-control', 'id': 'aid-item-select'}),
+            'sub_aid_item': forms.Select(attrs={'class': 'form-control', 'id': 'sub-aid-item-select'}),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['sub_aid_item'].queryset = SubAidItem.objects.none()
+
+        if 'aid_item' in self.data:
+            try:
+                aid_item_id = int(self.data.get('aid_item'))
+                self.fields['sub_aid_item'].queryset = SubAidItem.objects.filter(aid_item_id=aid_item_id)
+            except (ValueError, TypeError):
+                pass
+        elif self.instance.pk and self.instance.aid_item:
+            self.fields['sub_aid_item'].queryset = self.instance.aid_item.sub_items.all()
 
 
 class FarmerUpdateForm(forms.ModelForm):

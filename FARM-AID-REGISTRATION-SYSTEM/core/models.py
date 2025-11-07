@@ -69,7 +69,7 @@ class AidItem(models.Model):
     application_start = models.DateField()
     application_deadline = models.DateField()
     is_open_for_application = models.BooleanField(default=True)
-
+    subitems = models.JSONField(default=list, blank=True)
     def __str__(self):
         return self.get_name_display()
 
@@ -82,22 +82,13 @@ class SubAidItem(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.aid_item.get_name_display()})"
-
-# ✅ AidApplication model
 class AidApplication(models.Model):
     farmer = models.ForeignKey(Farmer, on_delete=models.CASCADE, related_name="applications")
-    resources_needed = models.CharField(
-        max_length=200,
-        choices=[
-            ('seedlings', 'Seedlings'),
-            ('fertilizers', 'Fertilizers'),
-            ('pesticides', 'Pesticides'),
-            ('livestock_vaccines', 'Livestock Vaccines'),
-            ('equipment', 'Farming Equipment'),
-            ('financial_support', 'Financial Support'),
-        ]
-    )
     aid_item = models.ForeignKey(AidItem, on_delete=models.SET_NULL, null=True, blank=True)
+    sub_aid_item = models.ForeignKey('SubAidItem', on_delete=models.SET_NULL, null=True, blank=True)  # ✅ New field
+    quantity_requested = models.PositiveIntegerField(default=0)
+
+   
 
     status = models.CharField(
         max_length=50,
@@ -112,20 +103,21 @@ class AidApplication(models.Model):
     applied_at = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
-        if not self.pk:  # new application
-
-            aid_item = AidItem.objects.filter(name=self.resources_needed).first()
-            if aid_item:
-                if aid_item.quantity_available > 0:
-                    aid_item.quantity_available -= 1
-                    aid_item.save()
-                    self.aid_item = aid_item
+        # Reduce stock for sub-item (if chosen)
+        if not self.pk:
+            if self.sub_aid_item:
+                sub_item = self.sub_aid_item
+                if sub_item.quantity_available > 0:
+                    sub_item.quantity_available -= 1
+                    sub_item.save()
+                    self.aid_item = sub_item.aid_item  # link parent aid item
                 else:
-                    raise ValueError(f"Sorry, {aid_item.get_name_display()} is out of stock.")
+                    raise ValueError(f"Sorry, {sub_item.name} is out of stock.")
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.farmer.full_name} - {self.resources_needed}"
+        return f"{self.farmer.full_name} - {self.sub_aid_item or self.aid_item}"
+
 
 
 # ✅ ContactMessage model

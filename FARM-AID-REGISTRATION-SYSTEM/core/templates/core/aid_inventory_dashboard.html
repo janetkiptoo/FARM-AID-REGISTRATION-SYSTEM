@@ -28,8 +28,9 @@
                 >
                     <td>{{ item.get_name_display }}</td>
                     <td>{{ item.quantity_available }}</td>
-                    <td>{{ item.start_date|date:"M d, Y" }}</td>
-                    <td>{{ item.deadline|date:"M d, Y" }}</td>
+                    <td>{{ item.application_start|date:"M d, Y" }}</td>
+                    <td>{{ item.application_deadline|date:"M d, Y" }}</td>
+
                     <td>
                         {% if item.is_open_for_application %}
                             <span style="color: green;">Open</span>

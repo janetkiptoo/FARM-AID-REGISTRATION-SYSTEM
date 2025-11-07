@@ -31,6 +31,7 @@ path('farmer/available-aid/', views.available_aid, name='available_aid'),
 path('officer/manage-aid/', views.manage_aid_inventory, name='manage_aid_inventory'),
 path("officer/aid-inventory/", views.aid_inventory_dashboard, name="aid_inventory_dashboard"),
 path("officer/aid-inventory/edit/<int:item_id>/", views.edit_aid_item, name="edit_aid_item"),
+path("get-sub-items/<int:aid_item_id>/", views.get_sub_items, name="get_sub_items"),
 
 
 ]

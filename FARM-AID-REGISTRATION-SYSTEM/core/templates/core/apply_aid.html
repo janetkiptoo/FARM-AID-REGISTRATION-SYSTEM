@@ -16,10 +16,11 @@
         </div>
     {% endif %}
 
-    <!-- Show aid availability and deadlines -->
+    <!-- Aid Availability Table -->
     <div class="aid-availability">
         <h3>Available Aid Resources</h3>
-        <table class="availability-table">
+
+        <table class="aid-table">
             <thead>
                 <tr>
                     <th>Resource</th>
@@ -31,34 +32,36 @@
             </thead>
             <tbody>
                 {% for item in available_items %}
-                    <tr>
-                        <td>{{ item.get_name_display }}</td>
+                    <tr class="main-item" onclick="toggleSubItems({{ item.id }})">
                         <td>
-                            {% if item.quantity_available > 0 %}
-                                {{ item.quantity_available }}
-                            {% else %}
-                                <span style="color: red;">Out of stock</span>
-                            {% endif %}
+                            <span id="arrow-{{ item.id }}" class="toggle-arrow">▶</span>
+                            {{ item.get_name_display }}
                         </td>
-                        <td>{{ item.start_date|date:"M d, Y" }}</td>
-                        <td>{{ item.deadline|date:"M d, Y" }}</td>
+                        <td>{{ item.quantity_available }}</td>
+                        <td>{{ item.application_start|date:"M d, Y" }}</td>
+                        <td>{{ item.application_deadline|date:"M d, Y" }}</td>
                         <td>
                             {% if item.is_open_for_application %}
-                                <span style="color: green;">Open</span>
+                                <span class="status-open">Open</span>
                             {% else %}
-                                <span style="color: gray;">Closed</span>
+                                <span class="status-closed">Closed</span>
                             {% endif %}
                         </td>
                     </tr>
-                {% empty %}
-                    <tr>
-                        <td colspan="5" style="text-align:center;">No aid items available at the moment.</td>
-                    </tr>
+
+                    {% for sub in item.sub_items.all %}
+                        <tr class="sub-item sub-of-{{ item.id }}">
+                            <td><span class="sub-icon">↳</span>{{ sub.name }}</td>
+                            <td>{{ sub.quantity_available }}</td>
+                            <td colspan="3">Sub-item of {{ item.get_name_display }}</td>
+                        </tr>
+                    {% endfor %}
                 {% endfor %}
             </tbody>
         </table>
     </div><br>
 
+    <!-- Application Form -->
     <form method="POST" class="apply-form">
         {% csrf_token %}
 
@@ -72,7 +75,26 @@
             <!-- Aid Request -->
             <fieldset class="form-box">
                 <legend>Aid Request</legend>
-                {{ aid_form.as_p }}
+                
+                <label for="aid-item-select">Select Aid Category:</label>
+                <select id="aid-item-select" name="aid_item" class="form-control">
+                    <option value="">Select a category</option>
+                    {% for item in aid_form.fields.aid_item.queryset %}
+                        <option value="{{ item.id }}">{{ item.get_name_display }}</option>
+                    {% endfor %}
+                </select><br>
+
+                <label for="sub-aid-item-select">Select Specific Aid Type:</label>
+                <select id="sub-aid-item-select" name="sub_aid_item" class="form-control">
+                    <option value="">Select a sub-item</option>
+                    {% for sub in aid_form.fields.sub_aid_item.queryset %}
+                        <option value="{{ sub.id }}">{{ sub.name }}</option>
+                    {% endfor %}
+                </select><br>
+
+               <label for="quantity_requested">Enter Quantity:</label>
+<input type="number" name="quantity_requested" id="quantity_requested" min="1" required class="form-control">
+
             </fieldset>
         </div><br>
 
@@ -82,29 +104,100 @@
     </form>
 </div>
 
+<!-- Dynamic Sub-item Loading -->
+<script>
+document.getElementById('aid-item-select').addEventListener('change', function() {
+    const aidItemId = this.value;
+    if (!aidItemId) return;
+
+    fetch(`/get-sub-items/${aidItemId}/`)
+        .then(response => response.json())
+        .then(data => {
+            const subAidSelect = document.getElementById('sub-aid-item-select');
+            subAidSelect.innerHTML = '<option value="">Select a sub-item</option>';
+            data.sub_items.forEach(sub => {
+                const option = document.createElement('option');
+                option.value = sub.id;
+                option.textContent = sub.name;
+                subAidSelect.appendChild(option);
+            });
+        })
+        .catch(error => console.error('Error loading sub-items:', error));
+});
+
+// Collapse/expand sub-items
+function toggleSubItems(itemId) {
+    const rows = document.querySelectorAll(`.sub-of-${itemId}`);
+    const arrow = document.getElementById(`arrow-${itemId}`);
+    rows.forEach(row => {
+        row.style.display = (row.style.display === 'table-row') ? 'none' : 'table-row';
+    });
+    arrow.textContent = (arrow.textContent === '▶') ? '▼' : '▶';
+}
+</script>
+
 <style>
 .apply-aid-container {
-    max-width: 900px;
+    max-width: 950px;
     margin: 30px auto;
     background: #fff;
     padding: 25px;
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
-.availability-table {
+
+/* Collapsible Table Styles */
+.aid-table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 15px;
+    font-family: 'Segoe UI', sans-serif;
 }
-.availability-table th, .availability-table td {
-    border: 1px solid #ddd;
-    padding: 8px 10px;
-    text-align: center;
-}
-.availability-table th {
-    background: #4CAF50;
+.aid-table th {
+    background-color: #2e7d32;
     color: white;
+    padding: 10px;
+    text-align: left;
 }
+.aid-table td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+tr.main-item {
+    background-color: #f5fff5;
+    font-weight: 600;
+    cursor: pointer;
+}
+tr.sub-item {
+    background-color: #fafafa;
+    display: none;
+}
+tr.sub-item td {
+    padding-left: 30px;
+}
+tr.main-item:hover {
+    background-color: #e8f5e9;
+}
+.status-open {
+    color: #2e7d32;
+    font-weight: bold;
+}
+.status-closed {
+    color: #d32f2f;
+    font-weight: bold;
+}
+.sub-icon {
+    color: #388e3c;
+    font-weight: bold;
+    margin-right: 6px;
+}
+.toggle-arrow {
+    font-weight: bold;
+    margin-right: 8px;
+    color: #2e7d32;
+}
+
+/* Form styles */
 .form-box {
     border: 1px solid #ccc;
     padding: 15px;
